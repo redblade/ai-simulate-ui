@@ -1,0 +1,1403 @@
+{
+ "updated": "2026-10-17",
+ "score_keys": [
+  "swe_bench_verified",
+  "swe_bench_pro",
+  "terminal_bench_2_0",
+  "terminal_bench_2_1",
+  "browsecomp",
+  "longbench_v2",
+  "mrcr",
+  "aa_lcr",
+  "mmlu_pro",
+  "gpqa_diamond"
+ ],
+ "models": [
+  {
+   "id": "moonshotai/Kimi-K2.5",
+   "name": "Kimi K2.5",
+   "total_params_b": 1000,
+   "active_params_b": 32,
+   "context_k": 256,
+   "license": "Modified MIT",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 76.8,
+     "source": "https://huggingface.co/moonshotai/Kimi-K2.5",
+     "vendor_reported": true,
+     "note": "non-thinking mode per card"
+    },
+    "swe_bench_pro": {
+     "value": 50.7,
+     "source": "https://huggingface.co/moonshotai/Kimi-K2.5",
+     "vendor_reported": true,
+     "note": "non-thinking"
+    },
+    "terminal_bench_2_0": {
+     "value": 50.8,
+     "source": "https://huggingface.co/moonshotai/Kimi-K2.5",
+     "vendor_reported": true,
+     "note": "non-thinking, Terminus-2"
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 60.6,
+     "source": "https://huggingface.co/moonshotai/Kimi-K2.5",
+     "vendor_reported": true,
+     "note": "74.9 w/ context management"
+    },
+    "longbench_v2": {
+     "value": 61.0,
+     "source": "https://huggingface.co/moonshotai/Kimi-K2.5",
+     "vendor_reported": true
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 87.1,
+     "source": "https://huggingface.co/moonshotai/Kimi-K2.5",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 87.6,
+     "source": "https://huggingface.co/moonshotai/Kimi-K2.5",
+     "vendor_reported": true
+    }
+   }
+  },
+  {
+   "id": "nvidia/Kimi-K2.7-Code-NVFP4",
+   "name": "Kimi K2.7 Code (NVFP4)",
+   "total_params_b": 1000,
+   "active_params_b": 32,
+   "context_k": 256,
+   "license": "NVIDIA Open Model License + Modified MIT (base)",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 74.3,
+     "source": "https://huggingface.co/nvidia/Kimi-K2.7-Code-NVFP4",
+     "vendor_reported": false,
+     "note": "measured by NVIDIA on NVFP4 quant; INT4 baseline 74.1; Moonshot card reports no SWE-bench"
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": 72.5,
+     "source": "https://huggingface.co/nvidia/Kimi-K2.7-Code-NVFP4",
+     "vendor_reported": false,
+     "note": "NVIDIA-measured NVFP4; INT4 baseline 71.9"
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 69.3,
+     "source": "https://huggingface.co/nvidia/Kimi-K2.7-Code-NVFP4",
+     "vendor_reported": false,
+     "note": "NVIDIA-measured NVFP4; baseline 69.5"
+    },
+    "mmlu_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "gpqa_diamond": {
+     "value": "n/a",
+     "source": null
+    }
+   },
+   "notes": "Moonshot card (https://huggingface.co/moonshotai/Kimi-K2.7-Code) reports only in-house/agentic benches: Kimi Code Bench v2 62.0, MCP Atlas 76.0, MCPMark Verified 81.1, Program Bench 53.6."
+  },
+  {
+   "id": "moonshotai/Kimi-K3",
+   "name": "Kimi K3",
+   "total_params_b": 2800,
+   "active_params_b": 104,
+   "context_k": 1024,
+   "license": "Kimi K3 License",
+   "scores": {
+    "swe_bench_verified": {
+     "value": "n/a",
+     "source": null
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": 88.3,
+     "source": "https://huggingface.co/moonshotai/Kimi-K3",
+     "vendor_reported": true,
+     "note": "max effort, run in Kimi Code harness"
+    },
+    "browsecomp": {
+     "value": 91.2,
+     "source": "https://huggingface.co/moonshotai/Kimi-K3",
+     "vendor_reported": true,
+     "note": "max effort"
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 74.7,
+     "source": "https://huggingface.co/moonshotai/Kimi-K3",
+     "vendor_reported": true,
+     "note": "may be third-party (Artificial Analysis) per card footnotes"
+    },
+    "mmlu_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "gpqa_diamond": {
+     "value": 93.5,
+     "source": "https://huggingface.co/moonshotai/Kimi-K3",
+     "vendor_reported": true
+    }
+   },
+   "notes": "No SWE-bench Verified/Pro on card; coding reported via DeepSWE 67.5, FrontierSWE 81.2, SWE-Marathon 42.0."
+  },
+  {
+   "id": "zai-org/GLM-5.2",
+   "name": "GLM-5.2",
+   "total_params_b": 753,
+   "active_params_b": 40,
+   "context_k": 1024,
+   "license": "MIT",
+   "scores": {
+    "swe_bench_verified": {
+     "value": "n/a",
+     "source": null
+    },
+    "swe_bench_pro": {
+     "value": 62.1,
+     "source": "https://huggingface.co/zai-org/GLM-5.2",
+     "vendor_reported": true
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": 81.0,
+     "source": "https://huggingface.co/zai-org/GLM-5.2",
+     "vendor_reported": true,
+     "note": "Terminus-2; 82.7 best reported harness"
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "gpqa_diamond": {
+     "value": 91.2,
+     "source": "https://huggingface.co/zai-org/GLM-5.2",
+     "vendor_reported": true
+    }
+   },
+   "notes": "Active params (~40B) from third-party article https://rits.shanghai.nyu.edu/ai/glm-5-2-z-ais-open-weights-coder-beats-gpt-5-5-at-1-6-the-cost/ ; not on HF card. No SWE-bench Verified reported."
+  },
+  {
+   "id": "deepseek-ai/DeepSeek-V4-Pro",
+   "name": "DeepSeek V4 Pro",
+   "total_params_b": 1600,
+   "active_params_b": 49,
+   "context_k": 1024,
+   "license": "MIT",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 80.6,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max; High 79.4; Non-think 73.6"
+    },
+    "swe_bench_pro": {
+     "value": 55.4,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    },
+    "terminal_bench_2_0": {
+     "value": 67.9,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 83.4,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    },
+    "longbench_v2": {
+     "value": 51.5,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "BASE model only (V4-Pro-Base), 1-shot"
+    },
+    "mrcr": {
+     "value": 83.5,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "MRCR 1M, Think Max"
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 87.5,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    },
+    "gpqa_diamond": {
+     "value": 90.1,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    }
+   }
+  },
+  {
+   "id": "deepseek-ai/DeepSeek-V4-Flash",
+   "name": "DeepSeek V4 Flash",
+   "total_params_b": 284,
+   "active_params_b": 13,
+   "context_k": 1024,
+   "license": "MIT",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 79.0,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max; High 78.6; Non-think 73.7"
+    },
+    "swe_bench_pro": {
+     "value": 52.6,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    },
+    "terminal_bench_2_0": {
+     "value": 56.9,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 73.2,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    },
+    "longbench_v2": {
+     "value": 44.7,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "BASE model only (V4-Flash-Base)"
+    },
+    "mrcr": {
+     "value": 78.7,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "MRCR 1M, Think Max"
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 86.2,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    },
+    "gpqa_diamond": {
+     "value": 88.1,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "Think Max"
+    }
+   }
+  },
+  {
+   "id": "deepseek-ai/DeepSeek-V3.2",
+   "name": "DeepSeek V3.2",
+   "total_params_b": 671,
+   "active_params_b": 37,
+   "context_k": 128,
+   "license": "MIT",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 73.1,
+     "source": "https://arxiv.org/pdf/2512.02556v1",
+     "vendor_reported": true,
+     "note": "thinking"
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": 46.4,
+     "source": "https://arxiv.org/pdf/2512.02556v1",
+     "vendor_reported": true,
+     "note": "thinking"
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 51.4,
+     "source": "https://arxiv.org/pdf/2512.02556v1",
+     "vendor_reported": true,
+     "note": "67.6 w/ context management"
+    },
+    "longbench_v2": {
+     "value": 40.2,
+     "source": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro",
+     "vendor_reported": true,
+     "note": "BASE model, from DeepSeek-V4 card comparison"
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 85.0,
+     "source": "https://arxiv.org/pdf/2512.02556v1",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 82.4,
+     "source": "https://arxiv.org/pdf/2512.02556v1",
+     "vendor_reported": true
+    }
+   },
+   "notes": "671B/37B from V3 architecture (HF lists 685B incl. MTP module)."
+  },
+  {
+   "id": "MiniMaxAI/MiniMax-M2.7",
+   "name": "MiniMax M2.7",
+   "total_params_b": 229.9,
+   "active_params_b": 9.8,
+   "context_k": 192,
+   "license": "Other (MiniMax license)",
+   "scores": {
+    "swe_bench_verified": {
+     "value": "n/a",
+     "source": null
+    },
+    "swe_bench_pro": {
+     "value": 56.2,
+     "source": "https://arxiv.org/pdf/2605.26494",
+     "vendor_reported": true
+    },
+    "terminal_bench_2_0": {
+     "value": 57.0,
+     "source": "https://arxiv.org/pdf/2605.26494",
+     "vendor_reported": true,
+     "note": "HF card labels it 'Terminal Bench 2'"
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 77.8,
+     "source": "https://arxiv.org/pdf/2605.26494",
+     "vendor_reported": true
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 81.8,
+     "source": "https://arxiv.org/pdf/2605.26494",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 89.8,
+     "source": "https://arxiv.org/pdf/2605.26494",
+     "vendor_reported": true
+    }
+   },
+   "notes": "Figures from MiniMax-M2 series tech report; Figure 1 shows SWE-Pro 50 conflicting with Table 4's 56.2. No SWE-bench Verified."
+  },
+  {
+   "id": "MiniMaxAI/MiniMax-M3",
+   "name": "MiniMax M3",
+   "total_params_b": 428,
+   "active_params_b": 23,
+   "context_k": 1024,
+   "license": "minimax-community",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 80.5,
+     "source": "https://huggingface.co/MiniMaxAI/MiniMax-M3",
+     "vendor_reported": true
+    },
+    "swe_bench_pro": {
+     "value": 59.0,
+     "source": "https://huggingface.co/MiniMaxAI/MiniMax-M3",
+     "vendor_reported": true
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "gpqa_diamond": {
+     "value": "n/a",
+     "source": null
+    }
+   },
+   "notes": "Card also reports Long-Horizon-Terminal-Bench (not Terminal-Bench 2.0): 38.5 mean reward."
+  },
+  {
+   "id": "Qwen/Qwen3.5-397B-A17B",
+   "name": "Qwen3.5-397B-A17B",
+   "total_params_b": 397,
+   "active_params_b": 17,
+   "context_k": 256,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 76.4,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+     "vendor_reported": true
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": 52.5,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+     "vendor_reported": true
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 69.0,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+     "vendor_reported": true,
+     "note": "78.6 with discard-all strategy"
+    },
+    "longbench_v2": {
+     "value": 63.2,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+     "vendor_reported": true
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 68.7,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+     "vendor_reported": true
+    },
+    "mmlu_pro": {
+     "value": 87.8,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 88.4,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-397B-A17B",
+     "vendor_reported": true
+    }
+   },
+   "notes": "Native 262,144 ctx, extensible to ~1M."
+  },
+  {
+   "id": "Qwen/Qwen3.5-122B-A10B",
+   "name": "Qwen3.5-122B-A10B",
+   "total_params_b": 122,
+   "active_params_b": 10,
+   "context_k": 256,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 72.0,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": 49.4,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 63.8,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "longbench_v2": {
+     "value": 60.2,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 66.9,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "mmlu_pro": {
+     "value": 86.7,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 86.6,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    }
+   }
+  },
+  {
+   "id": "Qwen/Qwen3.5-35B-A3B",
+   "name": "Qwen3.5-35B-A3B",
+   "total_params_b": 35,
+   "active_params_b": 3,
+   "context_k": 256,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 69.2,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": 40.5,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 61.0,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "longbench_v2": {
+     "value": 59.0,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 58.5,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "mmlu_pro": {
+     "value": 85.3,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 84.2,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    }
+   },
+   "notes": "Scores from the 122B card's comparison table; params/ctx/license inferred from model name and family (not verified on its own card)."
+  },
+  {
+   "id": "Qwen/Qwen3.5-27B",
+   "name": "Qwen3.5-27B (dense)",
+   "total_params_b": 27,
+   "active_params_b": 27,
+   "context_k": 256,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 72.4,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": 41.6,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 61.0,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "longbench_v2": {
+     "value": 60.6,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 66.1,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "mmlu_pro": {
+     "value": 86.1,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 85.5,
+     "source": "https://huggingface.co/Qwen/Qwen3.5-122B-A10B",
+     "vendor_reported": true
+    }
+   },
+   "notes": "Scores from the 122B card's comparison table; params/ctx/license inferred from family (not verified on its own card)."
+  },
+  {
+   "id": "Qwen/Qwen3-Coder-480B-A35B-Instruct",
+   "name": "Qwen3-Coder-480B-A35B",
+   "total_params_b": 480,
+   "active_params_b": 35,
+   "context_k": 256,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 69.6,
+     "source": "https://www.together.ai/models/qwen3-coder-480b-a35b-instruct",
+     "vendor_reported": true,
+     "note": "Qwen-reported (OpenHands, 500 turns per Qwen blog chart image); quoted by Together AI page"
+    },
+    "swe_bench_pro": {
+     "value": 38.7,
+     "source": "https://huggingface.co/Qwen/Qwen3-Coder-480B-A35B-Instruct",
+     "vendor_reported": false,
+     "note": "from HF eval-results sidebar; provenance unclear"
+    },
+    "terminal_bench_2_0": {
+     "value": 23.9,
+     "source": "https://huggingface.co/Qwen/Qwen3-Coder-480B-A35B-Instruct",
+     "vendor_reported": false,
+     "note": "HF eval-results sidebar, asterisked (third-party)"
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "gpqa_diamond": {
+     "value": "n/a",
+     "source": null
+    }
+   },
+   "notes": "Non-reasoning model; extensible to 1M via YaRN."
+  },
+  {
+   "id": "openai/gpt-oss-120b",
+   "name": "gpt-oss-120b",
+   "total_params_b": 116.83,
+   "active_params_b": 5.13,
+   "context_k": 128,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 62.4,
+     "source": "https://arxiv.org/pdf/2508.10925",
+     "vendor_reported": true,
+     "note": "high reasoning"
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "gpqa_diamond": {
+     "value": 80.1,
+     "source": "https://arxiv.org/pdf/2508.10925",
+     "vendor_reported": true,
+     "note": "high, no tools"
+    }
+   },
+   "notes": "MMLU (not Pro) 90.0."
+  },
+  {
+   "id": "openai/gpt-oss-20b",
+   "name": "gpt-oss-20b",
+   "total_params_b": 20.91,
+   "active_params_b": 3.61,
+   "context_k": 128,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 60.7,
+     "source": "https://arxiv.org/pdf/2508.10925",
+     "vendor_reported": true,
+     "note": "high reasoning"
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "gpqa_diamond": {
+     "value": 71.5,
+     "source": "https://arxiv.org/pdf/2508.10925",
+     "vendor_reported": true,
+     "note": "high, no tools"
+    }
+   },
+   "notes": "MMLU (not Pro) 85.3."
+  },
+  {
+   "id": "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B",
+   "name": "Nemotron 3 Super 120B-A12B",
+   "total_params_b": 120,
+   "active_params_b": 12,
+   "context_k": 1024,
+   "license": "NVIDIA Nemotron Open Model License",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 60.47,
+     "source": "https://build.nvidia.com/nvidia/nemotron-3-super-120b-a12b/modelcard",
+     "vendor_reported": true,
+     "note": "'SWE-Bench (OpenHands)', footnote says SWE-bench Verified implementation"
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": 31.0,
+     "source": "https://build.nvidia.com/nvidia/nemotron-3-super-120b-a12b/modelcard",
+     "vendor_reported": true,
+     "note": "'Terminal Bench Core 2.0'"
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 31.28,
+     "source": "https://build.nvidia.com/nvidia/nemotron-3-super-120b-a12b/modelcard",
+     "vendor_reported": true,
+     "note": "with search"
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 58.31,
+     "source": "https://build.nvidia.com/nvidia/nemotron-3-super-120b-a12b/modelcard",
+     "vendor_reported": true
+    },
+    "mmlu_pro": {
+     "value": 83.73,
+     "source": "https://build.nvidia.com/nvidia/nemotron-3-super-120b-a12b/modelcard",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 79.23,
+     "source": "https://build.nvidia.com/nvidia/nemotron-3-super-120b-a12b/modelcard",
+     "vendor_reported": true,
+     "note": "labelled 'GPQA (no tools)'"
+    }
+   },
+   "notes": "RULER-100@1M 91.75. HF default config 256K."
+  },
+  {
+   "id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+   "name": "Nemotron 3 Ultra 550B-A55B",
+   "total_params_b": 550,
+   "active_params_b": 55,
+   "context_k": 1024,
+   "license": "OpenMDW 1.1",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 70.7,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+     "vendor_reported": true
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": 56.4,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+     "vendor_reported": true
+    },
+    "browsecomp": {
+     "value": 44.4,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+     "vendor_reported": true
+    },
+    "longbench_v2": {
+     "value": 61.9,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+     "vendor_reported": true,
+     "note": "<=1M"
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 65.4,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+     "vendor_reported": true
+    },
+    "mmlu_pro": {
+     "value": 86.8,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 87.0,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+     "vendor_reported": true,
+     "note": "labelled 'GPQA (no tools)'"
+    }
+   },
+   "notes": "RULER 1M 94.7."
+  },
+  {
+   "id": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+   "name": "Nemotron 3 Nano 30B-A3B",
+   "total_params_b": 30,
+   "active_params_b": 3.5,
+   "context_k": 1024,
+   "license": "NVIDIA Nemotron Open Model License",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 38.8,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+     "vendor_reported": true,
+     "note": "'SWE-Bench (OpenHands)', Verified not stated explicitly"
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": 35.9,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+     "vendor_reported": true
+    },
+    "mmlu_pro": {
+     "value": 78.3,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 73.0,
+     "source": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+     "vendor_reported": true,
+     "note": "labelled 'GPQA (no tools)'"
+    }
+   },
+   "notes": "RULER-100@1M 86.3; HF default config 256K."
+  },
+  {
+   "id": "google/gemma-4-31B",
+   "name": "Gemma 4 31B (dense)",
+   "total_params_b": 30.7,
+   "active_params_b": 30.7,
+   "context_k": 256,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": "n/a",
+     "source": null
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": 66.4,
+     "source": "https://huggingface.co/google/gemma-4-31B",
+     "vendor_reported": true,
+     "note": "MRCR v2 8-needle 128k avg"
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 85.2,
+     "source": "https://huggingface.co/google/gemma-4-31B",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 84.3,
+     "source": "https://huggingface.co/google/gemma-4-31B",
+     "vendor_reported": true
+    }
+   },
+   "notes": "No SWE-bench reported; LiveCodeBench v6 80.0, tau2 avg 76.9."
+  },
+  {
+   "id": "google/gemma-4-26B-A4B",
+   "name": "Gemma 4 26B-A4B",
+   "total_params_b": 25.2,
+   "active_params_b": 3.8,
+   "context_k": 256,
+   "license": "Apache-2.0",
+   "scores": {
+    "swe_bench_verified": {
+     "value": "n/a",
+     "source": null
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": 44.1,
+     "source": "https://huggingface.co/google/gemma-4-31B",
+     "vendor_reported": true,
+     "note": "MRCR v2 8-needle 128k avg"
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 82.6,
+     "source": "https://huggingface.co/google/gemma-4-31B",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 82.3,
+     "source": "https://huggingface.co/google/gemma-4-31B",
+     "vendor_reported": true
+    }
+   },
+   "notes": "No SWE-bench reported; LiveCodeBench v6 77.1, tau2 avg 68.2."
+  },
+  {
+   "id": "XiaomiMiMo/MiMo-V2-Flash",
+   "name": "MiMo-V2-Flash",
+   "total_params_b": 309,
+   "active_params_b": 15,
+   "context_k": 256,
+   "license": "MIT",
+   "scores": {
+    "swe_bench_verified": {
+     "value": 73.4,
+     "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2-Flash",
+     "vendor_reported": true
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": 38.5,
+     "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2-Flash",
+     "vendor_reported": true
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": 45.4,
+     "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2-Flash",
+     "vendor_reported": true,
+     "note": "58.3 w/ context management"
+    },
+    "longbench_v2": {
+     "value": 60.6,
+     "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2-Flash",
+     "vendor_reported": true
+    },
+    "mrcr": {
+     "value": 45.7,
+     "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2-Flash",
+     "vendor_reported": true
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 84.9,
+     "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2-Flash",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 83.7,
+     "source": "https://huggingface.co/XiaomiMiMo/MiMo-V2-Flash",
+     "vendor_reported": true
+    }
+   },
+   "notes": "Pretrained at 32K native, extended to 256K."
+  },
+  {
+   "id": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+   "name": "Llama 4 Maverick",
+   "total_params_b": 400,
+   "active_params_b": 17,
+   "context_k": 1024,
+   "license": "Llama 4 Community License",
+   "scores": {
+    "swe_bench_verified": {
+     "value": "n/a",
+     "source": null
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 80.5,
+     "source": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+     "vendor_reported": true
+    },
+    "gpqa_diamond": {
+     "value": 69.8,
+     "source": "https://huggingface.co/meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+     "vendor_reported": true
+    }
+   },
+   "notes": "No SWE-bench/agentic scores from Meta."
+  },
+  {
+   "id": "meta-llama/Llama-3.1-70B-Instruct",
+   "name": "Llama 3.1 70B Instruct",
+   "total_params_b": 70,
+   "active_params_b": 70,
+   "context_k": 128,
+   "license": "Llama 3.1 Community License",
+   "scores": {
+    "swe_bench_verified": {
+     "value": "n/a",
+     "source": null
+    },
+    "swe_bench_pro": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_0": {
+     "value": "n/a",
+     "source": null
+    },
+    "terminal_bench_2_1": {
+     "value": "n/a",
+     "source": null
+    },
+    "browsecomp": {
+     "value": "n/a",
+     "source": null
+    },
+    "longbench_v2": {
+     "value": "n/a",
+     "source": null
+    },
+    "mrcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "aa_lcr": {
+     "value": "n/a",
+     "source": null
+    },
+    "mmlu_pro": {
+     "value": 66.4,
+     "source": "https://huggingface.co/meta-llama/Llama-3.1-70B-Instruct",
+     "vendor_reported": true,
+     "note": "5-shot CoT"
+    },
+    "gpqa_diamond": {
+     "value": "n/a",
+     "source": null
+    }
+   },
+   "notes": "GPQA 46.7 reported (0-shot) but subset not specified, so not entered as Diamond. BFCL 84.8."
+  }
+ ]
+}

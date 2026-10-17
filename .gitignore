@@ -1,0 +1,5 @@
+grid/
+runs/
+venv/
+sim.json
+__pycache__/

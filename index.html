@@ -1,0 +1,521 @@
+<title>Infra Planner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: scenario controls on the left, results board on the right; they stack on phones. */
+:root {
+  --bg: #f3f5f7;
+  --panel: #ffffff;
+  --ink: #17202a;
+  --muted: #5b6875;
+  --line: #d8dee5;
+  --accent: #1f5fa8;
+  --sys-nvl72: #0f8b80;
+  --sys-nvl8: #c27a0e;
+  --sys-rtx: #7b4fc4;
+  --good: #1d7a3e;
+  --warn: #a8640a;
+  --bad: #b3261e;
+  --chip: #e8edf3;
+  --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f141a; --panel: #161d25; --ink: #e5eaf0; --muted: #93a1af; --line: #2a3440;
+  --accent: #6aa6ec; --sys-nvl72: #3cc4b6; --sys-nvl8: #e6a23c; --sys-rtx: #a988e8;
+  --good: #4fbf74; --warn: #e3a33f; --bad: #ef6b62; --chip: #222c37; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f141a; --panel: #161d25; --ink: #e5eaf0; --muted: #93a1af; --line: #2a3440;
+  --accent: #6aa6ec; --sys-nvl72: #3cc4b6; --sys-nvl8: #e6a23c; --sys-rtx: #a988e8;
+  --good: #4fbf74; --warn: #e3a33f; --bad: #ef6b62; --chip: #222c37; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45; }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; max-width: 1400px; margin: 0 auto; display: grid; gap: 18px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: 2.1rem; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+h1 span { color: var(--muted); font-weight: 500; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 1.25rem; margin: 0; letter-spacing: .02em; }
+.sub { color: var(--muted); max-width: 70ch; margin: 0; }
+.label { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.grid { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 14px; min-width: 0; }
+.controls { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+@media (max-width: 900px) { .controls { position: static; } }
+.field { display: grid; gap: 6px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.seg button { font: inherit; font-size: .85rem; border: 0; background: transparent; color: var(--ink); padding: 6px 10px; cursor: pointer; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--panel); }
+.seg button:focus-visible, select:focus-visible, input:focus-visible, .mrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select, input[type=number] { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); color: var(--ink); width: 100%; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.hint { font-size: .78rem; color: var(--muted); }
+.toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+.models { display: grid; gap: 2px; max-height: 330px; overflow-y: auto; border: 1px solid var(--line); border-radius: 5px; }
+.mrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 7px 10px; cursor: pointer; border-left: 3px solid transparent; }
+.mrow:hover { background: var(--chip); }
+.mrow[aria-selected="true"] { background: var(--chip); border-left-color: var(--accent); }
+.mrow.off { opacity: .45; }
+.mname { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mmeta { font-size: .74rem; color: var(--muted); }
+.score { font-family: var(--mono); font-size: .9rem; text-align: right; }
+.bar { height: 3px; background: var(--line); border-radius: 2px; margin-top: 3px; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+
+.ucpanel { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.uc { font: inherit; text-align: left; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 6px; padding: 10px 12px; cursor: pointer; display: grid; gap: 2px; }
+.uc:hover { border-color: var(--accent); }
+.uc[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--chip); }
+.uc b { font-family: var(--display); font-size: 1.08rem; font-weight: 600; letter-spacing: .01em; }
+.uc span { font-family: var(--mono); font-size: .74rem; color: var(--muted); }
+.uc:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.snap { font-size: .78rem; color: var(--warn); }
+.verdict { display: grid; gap: 10px; }
+.verdict .big { font-family: var(--display); font-size: 1.7rem; font-weight: 600; line-height: 1.15; text-wrap: balance; }
+.band { display: flex; height: 34px; border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+.band div { display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 600; color: #fff; min-width: 0; overflow: hidden; white-space: nowrap; padding: 0 4px; }
+.bandaxis { display: flex; justify-content: space-between; font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.card { border: 1px solid var(--line); border-radius: 6px; padding: 12px; display: grid; gap: 6px; border-top: 4px solid var(--c); min-width: 0; }
+.card h3 { margin: 0; font-family: var(--display); font-size: 1.15rem; font-weight: 600; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: .84rem; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 7px; border-radius: 99px; background: var(--chip); color: var(--muted); }
+.pill.win { background: var(--good); color: var(--panel); }
+.pill.na { background: transparent; border: 1px solid var(--line); }
+.cfg { font-family: var(--mono); font-size: .72rem; color: var(--muted); overflow-wrap: anywhere; }
+
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
+.chart { min-width: 0; display: grid; gap: 6px; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { fill: var(--muted); font-family: var(--mono); font-size: 10px; }
+.chart .gridl { stroke: var(--line); stroke-width: 1; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .8rem; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c); margin-right: 5px; vertical-align: -1px; }
+.notes { font-size: .82rem; color: var(--muted); display: grid; gap: 6px; }
+.notes p { margin: 0; max-width: 95ch; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .82rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+td.num { text-align: right; }
+.empty { color: var(--muted); padding: 20px; text-align: center; }
+a { color: var(--accent); }
+@media (prefers-reduced-motion: no-preference) { .band div { transition: flex-grow .25s ease; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div style="display:grid;gap:4px">
+      <h1>Infra Planner <span>B300 NVL72 · NVL8 · RTX PRO 6000</span></h1>
+      <p class="sub">Which infrastructure fits each use case, model and expected traffic, at equal GPU count. The curves come from AISimulate (NVIDIA Dynamo) simulations on 72 GPUs per system.</p>
+    </div>
+    <span class="pill" id="dataStamp">loading data…</span>
+  </header>
+
+  <section style="display:grid;gap:8px" aria-label="Use cases">
+    <div class="row" style="justify-content:space-between;align-items:baseline"><span class="label">Use case</span><span class="hint" id="ucHint"></span></div>
+    <div class="ucpanel" id="ucPanel"></div>
+  </section>
+
+  <div class="grid">
+    <aside class="panel controls" aria-label="Scenario">
+      <div class="field">
+        <div class="row" style="justify-content:space-between;align-items:baseline">
+          <span class="label">Accuracy benchmark</span>
+        </div>
+        <div class="seg" id="metricSeg" aria-label="Benchmark"></div>
+        <p class="hint" id="metricDesc" style="margin:0"></p>
+        <div class="field">
+          <label class="hint" for="minScore">Minimum accuracy: <b class="num" id="minScoreVal"></b></label>
+          <input type="range" id="minScore" min="0" max="90" step="1" value="0">
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="label">Open-weight models</span>
+        <div class="models" id="modelList" role="listbox" aria-label="Models"></div>
+      </div>
+
+      <div class="field">
+        <span class="label">Input tokens (context per request)</span>
+        <div class="seg" id="islSeg"></div>
+      </div>
+      <div class="field">
+        <span class="label">Output tokens</span>
+        <div class="seg" id="oslSeg"></div>
+      </div>
+      <div class="field">
+        <span class="label">Prefix cache hit (reused KV)</span>
+        <div class="seg" id="pctSeg"></div>
+      </div>
+      <span class="snap" id="snap" hidden></span>
+      <label class="toggle"><input type="checkbox" id="dynamo" checked> <span><b>Dynamo enabled</b><br><span class="hint">disaggregated prefill/decode serving and KV-aware routing</span></span></label>
+
+      <div class="field">
+        <span class="label">SLA</span>
+        <label class="hint" for="ttft">Max TTFT (ms)</label>
+        <input type="number" id="ttft" min="100" step="100">
+        <label class="hint" for="minSpeed">Min speed per user (tokens/s)</label>
+        <input type="number" id="minSpeed" min="1" step="1">
+      </div>
+
+      <div class="field">
+        <label class="label" for="traffic">Expected traffic: <span class="num" id="trafficVal"></span></label>
+        <input type="range" id="traffic" min="-1" max="3.7" step="0.01">
+        <span class="hint" id="trafficHint"></span>
+      </div>
+    </aside>
+
+    <main style="display:grid;gap:18px;min-width:0">
+      <section class="panel verdict" aria-live="polite">
+        <span class="label">Recommendation</span>
+        <div class="big" id="verdict">Loading simulations…</div>
+        <div class="hint" id="verdictSub"></div>
+        <div>
+          <div class="band" id="band"></div>
+          <div class="bandaxis" id="bandAxis"></div>
+        </div>
+        <div class="hint">The band shows which system needs the fewest GPUs as traffic grows, rounded to the purchase unit (72-GPU rack for NVL72, 8-GPU node for NVL8 and RTX PRO 6000) up to 288 GPUs; beyond that, throughput per GPU decides.</div>
+      </section>
+
+      <section class="cards" id="cards"></section>
+
+      <section class="panel charts">
+        <div class="chart">
+          <h2>Throughput / interactivity frontier</h2>
+          <span class="hint">Tokens/s per GPU versus tokens/s per user, only points that meet the TTFT. The dashed line is the minimum required speed.</span>
+          <svg id="pareto" viewBox="0 0 520 330" role="img" aria-label="Pareto frontier per system"></svg>
+          <div class="legend" id="legend1"></div>
+        </div>
+        <div class="chart">
+          <h2>GPUs needed as traffic grows</h2>
+          <span class="hint">Log scales. The horizontal line is the 72-GPU comparison budget.</span>
+          <svg id="scaling" viewBox="0 0 520 330" role="img" aria-label="GPUs needed per traffic level"></svg>
+          <div class="legend" id="legend2"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Use case matrix</h2>
+        <span class="hint">All filtered models at the current scenario and traffic: capacity at 72 GPUs and most efficient system.</span>
+        <div class="tablewrap"><table id="matrix"></table></div>
+      </section>
+
+      <section class="panel notes">
+        <h2>How to read the numbers</h2>
+        <p><b>Source.</b> Each point is a configuration found by <span class="mono">aiconfigurator cli default</span> from the AISimulate package (TensorRT-LLM backend, vLLM for DeepSeek V4 Flash; SILICON perf database) with a 72-GPU budget: GB300 NVL72 (one NVLink rack), B300 HGX NVL8 (9 nodes of 8 over InfiniBand), RTX PRO 6000 server (9 nodes of 8, PCIe). AISimulate is experimental and NVIDIA positions it for evaluation, not for production capacity planning.</p>
+        <p><b>Dynamo on / off.</b> On: the best of aggregated and disaggregated serving, with the selected cache hit (assumed to be achieved by the KV-aware router). Off: aggregated serving only and no prefix reuse across replicas (round-robin routing). This is a modelling assumption: the Dynamo router is not simulated request by request in this version.</p>
+        <p><b>Traffic.</b> GPUs needed are estimated by linearly scaling the per-GPU throughput of the best point that meets the SLA. Above 72 GPUs this is an extrapolation.</p>
+        <p id="benchNote"><b>Benchmarks.</b> Published accuracy scores, mostly vendor-reported.</p>
+        <p id="failNote"></p>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+const SYS = {
+  gb300: { label: "GB300 NVL72", short: "NVL72", unit: 72, unitName: ["rack", "racks"], c: "--sys-nvl72" },
+  b300_sxm: { label: "B300 HGX NVL8", short: "NVL8", unit: 8, unitName: ["node", "nodes"], c: "--sys-nvl8" },
+  rtx_pro_6000_server: { label: "RTX PRO 6000", short: "RTX 6000", unit: 8, unitName: ["node", "nodes"], c: "--sys-rtx" },
+};
+const SYS_KEYS = Object.keys(SYS);
+const ISLS = [1000, 2000, 4000, 16000, 32000, 64000], OSLS = [100, 500, 1000, 2000, 4000, 8000], PCTS = [0, 50, 90];
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+const fmt = (v, d = 0) => v == null || !isFinite(v) ? "–" : Number(v).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const fmtK = v => v >= 1000 ? fmt(v / 1000, v >= 10000 ? 0 : 1) + "k" : fmt(v);
+
+let DATA = null;
+const S = { metric: null, uc: "rag", model: null, isl: 4000, osl: 500, pct: 50, dynamo: true, ttft: 2000, minSpeed: 20, traffic: 20, minScore: 0 };
+
+function load(key, fallback) { try { const v = localStorage.getItem("planner." + key); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } }
+function save() { try { localStorage.setItem("planner.state", JSON.stringify(S)); } catch {} }
+
+function seg(el, items, cur, onPick) {
+  el.innerHTML = "";
+  for (const it of items) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = it.label; b.setAttribute("aria-pressed", String(it.value === cur));
+    if (it.disabled) { b.disabled = true; b.title = it.title || ""; b.style.opacity = .4; }
+    b.onclick = () => onPick(it.value);
+    el.appendChild(b);
+  }
+}
+
+function ucDef() { return DATA.usecases[S.uc]; }
+function modelScore(m) {
+  const s = m.scores?.[S.metric];
+  return s && typeof s.value === "number" ? { key: S.metric, value: s.value, source: s.source, note: s.note } : null;
+}
+function metricLabel(k) { return DATA.metricLabels?.[k] || k; }
+
+// Closest simulated combination to the requested one (log distance on input/output tokens, same cache hit when possible).
+function resolve(simId) {
+  const pct = S.dynamo ? S.pct : 0, want = { isl: S.isl, osl: S.osl, pct };
+  const combos = new Map();
+  for (const key of Object.keys(DATA.results[simId] || {})) { const [, i, o, p] = key.split("|").map(Number); combos.set(`${i}|${o}|${p}`, { isl: i, osl: o, pct: p }); }
+  if (!combos.size) return null;
+  if (combos.has(`${want.isl}|${want.osl}|${want.pct}`)) return want;
+  let bestC = null, bestD = Infinity;
+  for (const c of combos.values()) {
+    const d = Math.abs(Math.log(c.isl / want.isl)) + Math.abs(Math.log(c.osl / want.osl)) + (c.pct === want.pct ? 0 : 1.5 + Math.abs(c.pct - want.pct) / 100);
+    if (d < bestD) { bestD = d; bestC = c; }
+  }
+  return bestC;
+}
+// Points per system for the current scenario, filtered by the TTFT SLA.
+function points(simId, sys) {
+  const c = resolve(simId); if (!c) return null;
+  const r = DATA.results[simId]?.[`${sys}|${c.isl}|${c.osl}|${c.pct}`];
+  if (!r) return null;
+  let pts = (r.agg || []).map(p => ({ mode: "agg", p }));
+  if (S.dynamo) pts = pts.concat((r.disagg || []).map(p => ({ mode: "disagg", p })));
+  return pts.map(({ mode, p }) => ({ mode, tpg: p[0], tpu: p[1], ttft: p[2], tpot: p[3], rpg: p[4], cfg: p[5] }))
+            .filter(x => x.ttft <= S.ttft);
+}
+function best(simId, sys) {
+  const pts = points(simId, sys);
+  if (pts == null) return { status: "nosim" };
+  const ok = pts.filter(x => x.tpu >= S.minSpeed);
+  if (!ok.length) return { status: "nosla", pts, maxSpeed: Math.max(0, ...pts.map(x => x.tpu)) };
+  const b = ok.reduce((a, x) => x.rpg > a.rpg ? x : a);
+  return { status: "ok", pts, b };
+}
+function gpusNeeded(rpg, t) { return t / rpg; }
+function purchased(sys, g) { const u = SYS[sys].unit; return Math.max(u, Math.ceil(g / u) * u); }
+// Up to 4 racks, rounding to the purchase unit matters; beyond that the waste is marginal and per-GPU efficiency decides.
+const ROUNDING_LIMIT = 288;
+function costGpus(sys, rpg, t) { const g = gpusNeeded(rpg, t); return g <= ROUNDING_LIMIT ? purchased(sys, g) : Math.ceil(g); }
+
+function render() {
+  if (!DATA) return;
+  save();
+  const uc = ucDef();
+  $("ucPanel").innerHTML = "";
+  for (const [k, v] of Object.entries(DATA.usecases)) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "uc"; b.setAttribute("aria-pressed", String(k === S.uc));
+    b.innerHTML = `<b>${v.label}</b><span>${fmtK(v.defaults.isl)} in → ${fmtK(v.defaults.osl)} out · cache ${v.defaults.pct}%</span>`;
+    b.onclick = () => { applyUc(k); render(); };
+    $("ucPanel").appendChild(b);
+  }
+  $("ucHint").textContent = uc.hint;
+  if (!uc.metrics.includes(S.metric)) S.metric = uc.metrics[0];
+  seg($("metricSeg"), uc.metrics.map(k => ({ value: k, label: metricLabel(k) })), S.metric, v => { S.metric = v; render(); });
+  [...$("metricSeg").children].forEach((b, i) => { b.title = DATA.metricInfo?.[uc.metrics[i]] || ""; });
+  $("metricDesc").innerHTML = DATA.metricInfo?.[S.metric] ? `<b>${metricLabel(S.metric)}.</b> ${DATA.metricInfo[S.metric]}` : "";
+  $("minScoreVal").textContent = S.minScore + "%";
+
+  // model list
+  const ms = DATA.models.map(m => ({ m, s: modelScore(m) }))
+    .sort((a, b) => (b.s?.value ?? -1) - (a.s?.value ?? -1));
+  const visible = ms.filter(x => S.minScore === 0 || (x.s?.value ?? 0) >= S.minScore);
+  if (!visible.some(x => x.m.sim === S.model)) S.model = (visible.find(x => DATA.results[x.m.sim]) || visible[0])?.m.sim;
+  const list = $("modelList"); list.innerHTML = "";
+  for (const { m, s } of visible) {
+    const row = document.createElement("div");
+    row.className = "mrow" + (DATA.results[m.sim] ? "" : " off");
+    row.setAttribute("role", "option"); row.tabIndex = 0;
+    row.setAttribute("aria-selected", String(m.sim === S.model));
+    const ctx = m.context_k ? `${m.context_k}k ctx` : "";
+    const size = m.total_params_b ? `${m.total_params_b}B${m.active_params_b && m.active_params_b !== m.total_params_b ? "/" + m.active_params_b + "B act." : ""}` : "";
+    row.innerHTML = `<div style="min-width:0"><div class="mname">${m.name}</div><div class="mmeta">${[size, ctx, DATA.results[m.sim] ? "" : "not simulated"].filter(Boolean).join(" · ")}</div></div>
+      <div><div class="score">${s ? fmt(s.value, 1) : "n/a"}</div><div class="bar"><i style="width:${s ? Math.min(100, s.value) : 0}%"></i></div></div>`;
+    row.title = s ? `${metricLabel(s.key)}: ${s.value}${s.note ? " · " + s.note : ""}\n${s.source || "source n/a"}` : "no published score for this benchmark";
+    const pick = () => { S.model = m.sim; render(); };
+    row.onclick = pick; row.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } };
+    list.appendChild(row);
+  }
+  const model = DATA.models.find(m => m.sim === S.model);
+  const ctxTok = model?.context_k ? model.context_k * 1000 : Infinity;
+  if (S.isl + S.osl > ctxTok * 1.03) S.isl = ISLS.filter(i => i + S.osl <= ctxTok * 1.03).pop() || ISLS[0];
+  seg($("islSeg"), ISLS.map(v => ({ value: v, label: fmtK(v), disabled: v + S.osl > ctxTok * 1.03, title: "beyond the model's context window" })), S.isl, v => { S.isl = v; render(); });
+  seg($("oslSeg"), OSLS.map(v => ({ value: v, label: fmtK(v) })), S.osl, v => { S.osl = v; render(); });
+  const rc = model && DATA.results[model.sim] ? resolve(model.sim) : null, wantPct = S.dynamo ? S.pct : 0;
+  const snapped = rc && (rc.isl !== S.isl || rc.osl !== S.osl || rc.pct !== wantPct);
+  $("snap").hidden = !snapped;
+  if (snapped) $("snap").textContent = `Combination not simulated yet: using the closest one, ${fmtK(rc.isl)} in / ${fmtK(rc.osl)} out, cache ${rc.pct}%.`;
+  seg($("pctSeg"), PCTS.map(v => ({ value: v, label: v + "%", disabled: !S.dynamo && v > 0, title: "without Dynamo, reuse across replicas is not guaranteed" })), S.dynamo ? S.pct : 0, v => { S.pct = v; render(); });
+  $("dynamo").checked = S.dynamo; $("ttft").value = S.ttft; $("minSpeed").value = S.minSpeed;
+  $("traffic").value = Math.log10(S.traffic);
+  $("trafficVal").textContent = fmt(S.traffic, S.traffic < 10 ? 1 : 0) + " req/s";
+  const tokDay = S.traffic * (S.isl + S.osl) * 86400;
+  $("trafficHint").textContent = `≈ ${fmt(S.traffic * 3600, 0)} requests/hour, ${fmt(tokDay / 1e9, 1)} billion tokens/day (in+out)`;
+
+  const res = {};
+  for (const k of SYS_KEYS) res[k] = model ? best(model.sim, k) : { status: "nosim" };
+  renderVerdict(model, res);
+  renderCards(res);
+  renderPareto(res);
+  renderScaling(res);
+  renderMatrix(visible.map(x => x.m));
+}
+
+function winnerAt(res, t) {
+  let w = null;
+  for (const k of SYS_KEYS) {
+    const r = res[k]; if (r.status !== "ok") continue;
+    const g = costGpus(k, r.b.rpg, t);
+    if (!w || g < w.g || (g === w.g && r.b.rpg > w.rpg)) w = { k, g, rpg: r.b.rpg };
+  }
+  return w;
+}
+
+function renderVerdict(model, res) {
+  const v = $("verdict"), sub = $("verdictSub");
+  if (!model) { v.textContent = "No model above the accuracy threshold."; sub.textContent = ""; $("band").innerHTML = ""; return; }
+  const w = winnerAt(res, S.traffic);
+  if (!w) {
+    const why = SYS_KEYS.map(k => res[k]).some(r => r.status === "nosla") ? "no system meets the SLA: lower the minimum speed or raise the TTFT" : "no simulation available for this scenario";
+    v.textContent = `${model.name}: ${why}.`; sub.textContent = ""; $("band").innerHTML = ""; $("bandAxis").innerHTML = ""; return;
+  }
+  const eff = SYS_KEYS.filter(k => res[k].status === "ok").map(k => `${SYS[k].short} ${fmt(res[k].b.tpg)}`).join(" · ");
+  v.innerHTML = `At ${fmt(S.traffic, S.traffic < 10 ? 1 : 0)} req/s the best fit is <span style="color:var(${SYS[w.k].c})">${SYS[w.k].label}</span>: ${fmt(w.g)} GPUs.`;
+  const rc = resolve(model.sim);
+  sub.textContent = `${model.name}, ${fmtK(rc.isl)} in / ${fmtK(rc.osl)} out, cache ${rc.pct}%, Dynamo ${S.dynamo ? "on" : "off"}. ` +
+    `Tokens/s per GPU at SLA: ${eff}.`;
+  // winner band across traffic (log scale from 0.1 to 5000 req/s)
+  const lo = -1, hi = 3.7, n = 240, segs = [];
+  for (let i = 0; i < n; i++) {
+    const t = 10 ** (lo + (hi - lo) * (i + .5) / n), ww = winnerAt(res, t)?.k || "none";
+    if (segs.length && segs[segs.length - 1].k === ww) segs[segs.length - 1].n++; else segs.push({ k: ww, n: 1, t });
+  }
+  $("band").innerHTML = segs.map(s => `<div style="flex:${s.n} 1 0;background:${s.k === "none" ? "var(--line)" : `var(${SYS[s.k].c})`}" title="from ${fmt(s.t, 1)} req/s">${s.n > 22 ? (SYS[s.k]?.short || "") : ""}</div>`).join("");
+  const ticks = [0.1, 1, 10, 100, 1000, 5000];
+  $("bandAxis").innerHTML = ticks.map(t => `<span>${fmt(t, t < 1 ? 1 : 0)}</span>`).join("");
+  const thr = segs.slice(1).map(s => `${SYS[s.k]?.short || "none"} from ${fmt(s.t, s.t < 10 ? 1 : 0)} req/s`);
+  if (thr.length) sub.textContent += ` Thresholds: ${SYS[segs[0].k]?.short || "none"} up to ${fmt(segs[1].t, segs[1].t < 10 ? 1 : 0)} req/s, then ${thr.join(", ")}.`;
+}
+
+function renderCards(res) {
+  const w = winnerAt(res, S.traffic);
+  $("cards").innerHTML = SYS_KEYS.map(k => {
+    const r = res[k], s = SYS[k];
+    let body;
+    if (r.status === "nosim") body = `<span class="pill na">cannot simulate</span><span class="hint">AISimulate has no data for this model on ${s.label} with this backend, or the configuration does not fit in memory.</span>`;
+    else if (r.status === "nosla") body = `<span class="pill na">SLA not met</span><span class="hint">Max speed with TTFT ≤ ${fmt(S.ttft)} ms: ${fmt(r.maxSpeed, 0)} tokens/s per user.</span>`;
+    else {
+      const g = gpusNeeded(r.b.rpg, S.traffic), buy = purchased(k, g);
+      body = `${w?.k === k ? '<span class="pill win">recommended</span>' : ""}
+        <dl class="kv">
+          <dt>Capacity at 72 GPUs</dt><dd>${fmt(r.b.rpg * 72, 1)} req/s</dd>
+          <dt>Tokens/s per GPU</dt><dd>${fmt(r.b.tpg)}</dd>
+          <dt>Tokens/s per user</dt><dd>${fmt(r.b.tpu, 1)}</dd>
+          <dt>TTFT</dt><dd>${fmt(r.b.ttft)} ms</dd>
+          <dt>GPUs for ${fmt(S.traffic, S.traffic < 10 ? 1 : 0)} req/s</dt><dd>${fmt(Math.ceil(g))} → ${fmt(buy)}</dd>
+          <dt>Units</dt><dd>${fmt(buy / s.unit)} ${s.unitName[buy / s.unit === 1 ? 0 : 1]}</dd>
+        </dl>
+        <div class="cfg">${r.b.mode === "disagg" ? "disaggregated" : "aggregated"}: ${r.b.cfg}</div>`;
+    }
+    return `<article class="card" style="--c:var(${s.c})"><h3>${s.label}</h3>${body}</article>`;
+  }).join("");
+}
+
+function axes(svg, xs, ys, xLab, yLab, logx, logy) {
+  const W = 520, H = 330, L = 56, R = 12, T = 12, B = 40;
+  const tx = logx ? v => L + (Math.log10(v) - Math.log10(xs[0])) / (Math.log10(xs[1]) - Math.log10(xs[0])) * (W - L - R) : v => L + (v - xs[0]) / (xs[1] - xs[0]) * (W - L - R);
+  const ty = logy ? v => H - B - (Math.log10(v) - Math.log10(ys[0])) / (Math.log10(ys[1]) - Math.log10(ys[0])) * (H - T - B) : v => H - B - (v - ys[0]) / (ys[1] - ys[0]) * (H - T - B);
+  const ticks = (r, log) => {
+    if (log) { const out = []; for (let e = Math.floor(Math.log10(r[0])); e <= Math.ceil(Math.log10(r[1])); e++) { const v = 10 ** e; if (v >= r[0] * .999 && v <= r[1] * 1.001) out.push(v); } return out; }
+    const step = niceStep((r[1] - r[0]) / 5); const out = []; for (let v = Math.ceil(r[0] / step) * step; v <= r[1] + 1e-9; v += step) out.push(v); return out;
+  };
+  let g = "";
+  for (const v of ticks(xs, logx)) g += `<line class="gridl" x1="${tx(v)}" x2="${tx(v)}" y1="${T}" y2="${H - B}"/><text x="${tx(v)}" y="${H - B + 14}" text-anchor="middle">${fmtK(v)}</text>`;
+  for (const v of ticks(ys, logy)) g += `<line class="gridl" x1="${L}" x2="${W - R}" y1="${ty(v)}" y2="${ty(v)}"/><text x="${L - 6}" y="${ty(v) + 3}" text-anchor="end">${fmtK(v)}</text>`;
+  g += `<text x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle">${xLab}</text><text transform="translate(12 ${(T + H - B) / 2}) rotate(-90)" text-anchor="middle">${yLab}</text>`;
+  svg.innerHTML = g;
+  return { tx, ty, L, R, T, B, W, H };
+}
+function niceStep(raw) { const p = 10 ** Math.floor(Math.log10(raw)); const f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; }
+function frontier(pts) {
+  const s = [...pts].sort((a, b) => b.tpu - a.tpu); const out = []; let maxY = -1;
+  for (const p of s) if (p.tpg > maxY) { out.push(p); maxY = p.tpg; }
+  return out;
+}
+
+function renderPareto(res) {
+  const svg = $("pareto");
+  const all = SYS_KEYS.flatMap(k => res[k].pts || []);
+  if (!all.length) { svg.innerHTML = `<text x="260" y="165" text-anchor="middle">No points for this scenario</text>`; $("legend1").innerHTML = ""; return; }
+  const xmax = Math.max(S.minSpeed * 1.2, ...all.map(p => p.tpu)) * 1.05, ymax = Math.max(...all.map(p => p.tpg)) * 1.08;
+  const a = axes(svg, [0, xmax], [0, ymax], "tokens/s per user", "tokens/s per GPU");
+  let g = `<line x1="${a.tx(S.minSpeed)}" x2="${a.tx(S.minSpeed)}" y1="${a.T}" y2="${a.H - a.B}" stroke="${css("--muted")}" stroke-dasharray="4 4"/>`;
+  for (const k of SYS_KEYS) {
+    const r = res[k]; if (!r.pts?.length) continue;
+    const col = css(SYS[k].c), f = frontier(r.pts);
+    g += `<polyline fill="none" stroke="${col}" stroke-width="2" points="${f.map(p => `${a.tx(p.tpu)},${a.ty(p.tpg)}`).join(" ")}"/>`;
+    for (const p of f) g += `<circle cx="${a.tx(p.tpu)}" cy="${a.ty(p.tpg)}" r="${p.mode === "disagg" ? 3.2 : 2.4}" fill="${p.mode === "disagg" ? col : css("--panel")}" stroke="${col}" stroke-width="1.3"><title>${SYS[k].short} ${p.mode}: ${fmt(p.tpg)} tok/s/GPU, ${fmt(p.tpu, 1)} tok/s/user, TTFT ${fmt(p.ttft)} ms\n${p.cfg}</title></circle>`;
+    if (r.status === "ok") g += `<circle cx="${a.tx(r.b.tpu)}" cy="${a.ty(r.b.tpg)}" r="6.5" fill="none" stroke="${col}" stroke-width="2"/>`;
+  }
+  svg.insertAdjacentHTML("beforeend", g);
+  $("legend1").innerHTML = SYS_KEYS.map(k => `<span style="--c:var(${SYS[k].c})">${SYS[k].label}</span>`).join("") + `<span class="hint">filled = disaggregated, hollow = aggregated, ring = chosen point</span>`;
+}
+
+function renderScaling(res) {
+  const svg = $("scaling");
+  const ok = SYS_KEYS.filter(k => res[k].status === "ok");
+  if (!ok.length) { svg.innerHTML = `<text x="260" y="165" text-anchor="middle">No system meets the SLA</text>`; $("legend2").innerHTML = ""; return; }
+  const xs = [0.1, 5000];
+  const ymin = 1, ymax = Math.max(1000, ...ok.map(k => purchased(k, gpusNeeded(res[k].b.rpg, xs[1])))) * 1.2;
+  const a = axes(svg, xs, [ymin, ymax], "requests/s", "GPUs", true, true);
+  let g = `<line x1="${a.L}" x2="${a.W - a.R}" y1="${a.ty(72)}" y2="${a.ty(72)}" stroke="${css("--muted")}" stroke-dasharray="4 4"/><text x="${a.W - a.R - 4}" y="${a.ty(72) - 4}" text-anchor="end">72 GPUs</text>`;
+  for (const k of ok) {
+    const col = css(SYS[k].c), pts = [];
+    for (let i = 0; i <= 200; i++) { const t = 10 ** (Math.log10(xs[0]) + (Math.log10(xs[1]) - Math.log10(xs[0])) * i / 200); pts.push([t, purchased(k, gpusNeeded(res[k].b.rpg, t))]); }
+    let d = ""; pts.forEach(([t, gg], i) => { const x = a.tx(t), y = a.ty(gg); d += i === 0 ? `M${x},${y}` : `H${x}V${y}`; });
+    g += `<path d="${d}" fill="none" stroke="${col}" stroke-width="2"/>`;
+  }
+  g += `<line x1="${a.tx(S.traffic)}" x2="${a.tx(S.traffic)}" y1="${a.T}" y2="${a.H - a.B}" stroke="${css("--accent")}" stroke-width="1.5"/>`;
+  svg.insertAdjacentHTML("beforeend", g);
+  $("legend2").innerHTML = ok.map(k => `<span style="--c:var(${SYS[k].c})">${SYS[k].label}</span>`).join("") + `<span class="hint">blue line = selected traffic</span>`;
+}
+
+function renderMatrix(models) {
+  const rows = models.map(m => {
+    const s = modelScore(m);
+    const r = {}; for (const k of SYS_KEYS) r[k] = DATA.results[m.sim] ? best(m.sim, k) : { status: "nosim" };
+    const w = winnerAt(r, S.traffic);
+    const cell = k => r[k].status === "ok" ? `${fmt(r[k].b.rpg * 72, 1)}` : r[k].status === "nosla" ? "SLA ✕" : "–";
+    return `<tr><td>${m.name}</td><td class="num">${s ? fmt(s.value, 1) : "n/a"}</td>${SYS_KEYS.map(k => `<td class="num">${cell(k)}</td>`).join("")}<td>${w ? `<span style="color:var(${SYS[w.k].c});font-weight:600">${SYS[w.k].short}</span> <span class="hint">${fmt(w.g)} GPUs</span>` : "–"}</td></tr>`;
+  }).join("");
+  $("matrix").innerHTML = `<thead><tr><th>Model</th><th title="${DATA.metricInfo?.[S.metric] || ""}">${metricLabel(S.metric)}</th>${SYS_KEYS.map(k => `<th>${SYS[k].short} req/s @72</th>`).join("")}<th>Recommended at ${fmt(S.traffic, S.traffic < 10 ? 1 : 0)} req/s</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+function applyUc(k) {
+  S.uc = k; S.metric = DATA.usecases[k].metrics[0]; const d = DATA.usecases[k].defaults;
+  Object.assign(S, d);
+}
+
+function wire() {
+  $("minScore").oninput = e => { S.minScore = +e.target.value; render(); };
+  $("dynamo").onchange = e => { S.dynamo = e.target.checked; render(); };
+  $("ttft").onchange = e => { S.ttft = Math.max(100, +e.target.value || 2000); render(); };
+  $("minSpeed").onchange = e => { S.minSpeed = Math.max(1, +e.target.value || 10); render(); };
+  $("traffic").oninput = e => { S.traffic = Math.round(10 ** +e.target.value * 10) / 10; render(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", render);
+  new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+
+fetch("data.json").then(r => r.json()).then(d => {
+  DATA = d;
+  applyUc("chat");
+  Object.assign(S, load("state", {}));
+  if (!DATA.usecases[S.uc]) applyUc("chat");
+  $("dataStamp").textContent = `simulations from ${d.generated} · ${d.combos} scenarios`;
+  if (d.benchNote) $("benchNote").innerHTML = `<b>Benchmarks.</b> ${d.benchNote}`;
+  if (d.failures?.length) $("failNote").innerHTML = `<b>Cannot simulate.</b> ${d.failures.length} model/system/scenario combinations produced no results (missing data for that system, or not enough memory) and show as "cannot simulate".`;
+  wire(); render();
+}).catch(err => { $("verdict").textContent = "Cannot read data.json: " + err.message; });
+</script>

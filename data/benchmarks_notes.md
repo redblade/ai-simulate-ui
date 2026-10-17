@@ -1,0 +1,27 @@
+# Benchmark data caveats (updated 2026-10-17)
+
+- **Almost every number is vendor-reported**, taken from the HF model card, tech report or official blog. Exceptions have `vendor_reported: false`:
+  - Kimi K2.7 Code: NVIDIA measured these scores on its own NVFP4 quant.
+  - Qwen3-Coder: the SWE-bench Pro and Terminal-Bench 2.0 numbers come from HF's eval-results sidebar.
+- **Scaffolds and modes differ.** Each lab uses its own harness, effort level and turn budget, so cross-vendor comparisons are approximate. Examples:
+  - DeepSeek V4 uses Think Max.
+  - Kimi K3 uses max effort.
+  - The Kimi K2.5 SWE-bench scores are non-thinking.
+  - Nemotron uses OpenHands.
+  - The Qwen3-Coder 69.6 used OpenHands with 500 turns.
+- **Terminal-Bench 2.1 vs 2.0.** The newest models (Kimi K3, GLM-5.2, Kimi K2.7 Code, Nemotron 3 Ultra) report only Terminal-Bench 2.1. It is stored in a separate `terminal_bench_2_1` key and is not comparable with 2.0.
+- **SWE-bench Verified is missing for several frontier models.** Kimi K3, GLM-5.2 and MiniMax M2.7 report SWE-bench Pro or other suites (DeepSWE, FrontierSWE) instead. Kimi K2.7 Code's Moonshot card reports only in-house benches.
+- **Long-context metrics are not uniform.**
+  - LongBench v2 for DeepSeek V4 and V3.2 is from the *base* models only.
+  - MRCR covers different variants: DeepSeek V4 uses MRCR 1M, Gemma 4 uses MRCR v2 8-needle at 128k, and MiMo's variant is unspecified.
+  - AA-LCR is included where reported. For Kimi K3 it may come from Artificial Analysis.
+- **GPQA.** Nemotron cards say "GPQA (no tools)" without naming the Diamond subset. Llama 3.1 70B's GPQA (46.7) is not labelled Diamond, so it is omitted. gpt-oss reports MMLU, not MMLU-Pro (see notes).
+- **Params and context.**
+  - DeepSeek V3.2 is listed as 671B/37B. HF shows 685B because it includes the MTP module.
+  - GLM-5.2's ~40B active comes from a third-party article and is not on the HF card.
+  - Qwen3.5-35B-A3B and 27B: params, context and license are inferred from the name and family. Their scores come from the 122B card.
+  - Context values are native or max as stated. Qwen3.5 and Nemotron default configs are 256K but can be extended to about 1M.
+  - context_k uses 1024 for "1M".
+- The MiniMax M2.7 tech report contradicts itself on SWE-Pro (Figure 1 says 50, Table 4 says 56.2). Table 4 was used.
+- No SWE-bench numbers were found for Gemma 4, Llama 4 Maverick or Llama 3.1 70B.
+- The swebench.com leaderboard was not used. Its bash-only entries differ from vendor numbers.
