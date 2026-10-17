@@ -214,6 +214,7 @@ a { color: var(--accent); }
 
       <section class="panel notes">
         <h2>How to read the numbers</h2>
+        <p><b>Synthetic data.</b> All results are simulated, not measured, and use synthetic traffic: every request in a scenario has the same input and output length, and cache reuse is a fixed share of the prompt rather than real multi-turn or agentic sessions. Use them to compare systems, not to predict production numbers.</p>
         <p><b>Source.</b> Each point is a configuration found by <span class="mono">aiconfigurator cli default</span> from the AISimulate package (TensorRT-LLM backend, vLLM for DeepSeek V4 Flash; SILICON perf database) with a 72-GPU budget: GB300 NVL72 (one NVLink rack), B300 HGX NVL8 (9 nodes of 8 over InfiniBand), RTX PRO 6000 server (9 nodes of 8, PCIe). AISimulate is experimental and NVIDIA positions it for evaluation, not for production capacity planning.</p>
         <p><b>Dynamo on / off.</b> On: the best of aggregated and disaggregated serving, with the selected cache hit (assumed to be achieved by the KV-aware router). Off: aggregated serving only and no prefix reuse across replicas (round-robin routing). This is a modelling assumption: the Dynamo router is not simulated request by request in this version.</p>
         <p><b>Traffic.</b> GPUs needed are estimated by linearly scaling the per-GPU throughput of the best point that meets the SLA. Above 72 GPUs this is an extrapolation.</p>
