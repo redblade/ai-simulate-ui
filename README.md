@@ -11,14 +11,29 @@ It compares **GB300 NVL72**, **B300 HGX NVL8** and **RTX PRO 6000** at equal GPU
 
 ## Contents
 
-1. [What the page does](#what-the-page-does)
-2. [How it works](#how-it-works)
-3. [The simulation grid](#the-simulation-grid)
-4. [Modelling assumptions](#modelling-assumptions)
-5. [Limitations](#limitations)
-6. [Repository layout](#repository-layout)
-7. [Regenerating the data](#regenerating-the-data)
-8. [Roadmap: validation (v2)](#roadmap-validation-v2)
+1. [Quick start](#quick-start)
+2. [What the page does](#what-the-page-does)
+3. [How it works](#how-it-works)
+4. [The simulation grid](#the-simulation-grid)
+5. [Modelling assumptions](#modelling-assumptions)
+6. [Limitations](#limitations)
+7. [Repository layout](#repository-layout)
+8. [Regenerating the data](#regenerating-the-data)
+9. [Roadmap: validation (v2)](#roadmap-validation-v2)
+
+## Quick start
+
+The simulation results are already in `data.json`, so viewing the page needs only Python 3 and a browser:
+
+```bash
+git clone https://github.com/redblade/ai-simulate-ui.git
+cd ai-simulate-ui
+python3 -m http.server 8000
+```
+
+Then open <http://localhost:8000/index.html>. Opening `index.html` directly from disk does not work, because the page loads `data.json` with `fetch`.
+
+To rerun the simulations instead, see [Regenerating the data](#regenerating-the-data).
 
 ## What the page does
 
@@ -124,7 +139,7 @@ python3 scripts/build_data.py sim.json data/benchmarks.json data.json
 
 - Each run takes 20 s to 4 min on one core; the full grid takes a few hours with 4 processes.
 - Finished runs are skipped, so the script can be stopped and restarted.
-- To view the page locally, serve the folder with `python3 -m http.server` and open `index.html`. The page loads `data.json` with `fetch`, which does not work from `file://`.
+- Then view the page as in [Quick start](#quick-start).
 
 ## Roadmap: validation (v2)
 
