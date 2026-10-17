@@ -64,3 +64,15 @@ To view the page locally, serve the folder (`python3 -m http.server`) and open `
 - Loose simulation SLAs (TTFT 10 s, TPOT 200 ms); the UI then filters by TTFT and per-user speed.
 - GPUs needed = traffic / (req/s per GPU of the best point at SLA), rounded to the purchase unit up to 288 GPUs.
 - When the selected input/output combination was not simulated, the page uses the closest simulated one and says so.
+
+## Validation and roadmap (v2)
+
+Planned next steps to check the simulated numbers against real measurements. None of this is implemented yet.
+
+**Fixed-length scenarios against InferenceX.** [InferenceX](https://inferencex.semianalysis.com) (SemiAnalysis) measures real hardware, including GB300 NVL72 and B300, on the same axes this page uses: tokens/s per GPU against tokens/s per user. Its fixed-length scenarios (1k/1k chat, 1k/8k reasoning, 8k/1k summarization) use random prompts with prefix caching disabled, so they are a no-reuse, worst case for the cache. The plan is to simulate the same scenarios at 0% cache for the models both projects cover, then report the gap in throughput per GPU at equal interactivity. Real traffic almost always reuses some prefix (system prompts, chat history, popular documents), so real deployments should match or beat these numbers; our 50% and 90% cache scenarios are assumptions that InferenceX does not measure.
+
+**Agentic coding calibrated on real traces.** Today agentic coding is a synthetic scenario with a fixed 90% cache hit. In agentic traffic, though, the cache hit is an outcome: it depends on session structure and on whether the working set fits in memory, so prefixes get evicted under load. The v2 approach:
+1. **Calibrate a synthetic preset on real traces.** From InferenceX's public AgentX coding-agent traces (`semianalysisai/cc-traces-weka-062126` on Hugging Face), derive the effective cache hit, context growth per turn, turns per session and inter-turn pauses. Feed them into AISimulate's multi-turn synthetic sessions. The preset stays controllable and comparable with the other use cases, but its cache reuse reflects real sessions.
+2. **Cross-check three ways.** Replay the real AgentX trace in AISimulate (it supports the `weka` trace format). Compare it with the calibrated synthetic preset and with InferenceX's measured AgentX results on GB300 and B300. If the three curves agree, the synthetic preset can be trusted for planning.
+
+Both steps need network access to `inferencex.semianalysis.com` and `huggingface.co`.
