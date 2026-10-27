@@ -143,7 +143,7 @@ python3 scripts/build_data.py sim.json data/benchmarks.json data.json
 
 ## Roadmap: validation (v2)
 
-Planned next steps to check the simulated numbers against real measurements. None of this is implemented yet.
+Planned next steps to check the simulated numbers against real measurements. The first check against InferenceX is in [`validation/`](validation/README.md): measured GB300 is about 1.6–1.8× B300 per GPU (median), while the simulation gives about 1.05×, because AISimulate cannot simulate wide expert parallelism across the NVL72 rack.
 
 ### Fixed-length scenarios against InferenceX
 
