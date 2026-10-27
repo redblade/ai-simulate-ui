@@ -4,10 +4,13 @@ Infra Planner helps choose GPU infrastructure for LLM inference. It answers one 
 
 > *For this use case, this model and this much traffic, which GPU system should I buy, and how many GPUs do I need?*
 
-It compares **GB300 NVL72**, **B300 HGX NVL8** and **RTX PRO 6000** at equal GPU count (72), using performance simulated with NVIDIA's [AISimulate](https://docs.nvidia.com/dynamo/dev/knowledge-base/concepts/simulation/ai-simulate/overview).
+It compares **GB300 NVL72**, **B300 HGX NVL8** and **RTX PRO 6000** at equal GPU count (72). It has two data sources, selectable on the page:
+
+- **Simulated:** performance simulated with NVIDIA's [AISimulate](https://docs.nvidia.com/dynamo/dev/knowledge-base/concepts/simulation/ai-simulate/overview), for every model, workload and cache level in the grid.
+- **Measured:** real runs from [SemiAnalysis InferenceX](https://inferencex.semianalysis.com), for the models, systems and workloads it covers.
 
 > [!IMPORTANT]
-> All results are **simulated on synthetic traffic**, not measured. No real GPU and no real request ran. Use the numbers to compare systems under controlled conditions, not to predict production performance. See [Limitations](#limitations).
+> Simulated results use **synthetic traffic**: no real GPU and no real request ran. Checked against InferenceX ([`validation/`](validation/README.md)), the simulation **underestimates GB300 NVL72** on large MoE models: measured about 1.6–1.8× B300 per GPU (median), simulated about 1.05×. Prefer the Measured source where it exists. See [Limitations](#limitations).
 
 ## Contents
 
@@ -58,7 +61,9 @@ To rerun the simulations instead, see [Regenerating the data](#regenerating-the-
 | Document Q&A, summarization | LongBench v2, AA-LCR (plus BrowseComp for Q&A) |
 | Code completion, agentic coding | SWE-bench Verified, SWE-bench Pro, Terminal-Bench 2.0 |
 
-**3. Read the recommendation.** For each system, the page finds the most efficient serving configuration that meets the SLA. It then shows:
+**3. Pick the data source.** *Simulated* covers all models and scenarios. *Measured* uses InferenceX runs: only 1k/1k, 1k/8k and 8k/1k, no prefix cache, and the models SemiAnalysis tested (Qwen3.5-397B, Kimi K2.5, DeepSeek V4 Pro, DeepSeek R1, MiniMax M2.5/M3, GLM-5). When the selected workload was not measured, the page uses the closest measured one and says so. Each measured point links to its InferenceX run.
+
+**4. Read the recommendation.** For each system, the page finds the most efficient serving configuration that meets the SLA. It then shows:
 - the recommended system at the selected traffic, with the GPUs and purchase units (racks or nodes) it needs;
 - the traffic thresholds where the recommendation changes (for example "NVL8 up to 250 req/s, then NVL72");
 - the throughput/interactivity frontier of each system, and how GPU count grows with traffic;
@@ -71,6 +76,8 @@ run_grid.sh ──> AISimulate (aiconfigurator cli default) ──> pareto.csv p
                                                                 │
 collect.py  ──> sim.json  ──┐                                   │
 benchmarks.json ────────────┴──> build_data.py ──> data.json ──> index.html
+                                                        ▲
+InferenceX dump ──> validation/fetch_dump.sh, parse_dump.py ──> tables.json ──> build_measured.py
 ```
 
 **AISimulate** is NVIDIA's experimental simulator for Dynamo deployments. It needs no GPUs. It estimates each forward pass from kernel performance data (GEMM, attention, MoE, communication) that NVIDIA measured on each system and ships inside the Python package.
@@ -108,7 +115,8 @@ The 64 runs without results are almost all on RTX PRO 6000. There AISimulate has
 ## Limitations
 
 - **Synthetic traffic.** Every request in a scenario has the same input and output length. Cache reuse is a fixed share of the prompt rather than real multi-turn or agentic sessions. Real traffic has length distributions, bursts and cache eviction under memory pressure, which this version does not capture.
-- **Simulated, not measured.** AISimulate is experimental, and NVIDIA positions it for evaluation, not production capacity planning.
+- **Simulated, not measured.** AISimulate is experimental, and NVIDIA positions it for evaluation, not production capacity planning. On InferenceX configurations it underestimates throughput per GPU by 30–40% and cannot simulate wide expert parallelism on GB300 (see [`validation/`](validation/README.md)).
+- **Measured data is narrower.** InferenceX covers three workloads, no prefix cache, no RTX PRO 6000 beyond a few Qwen3.5 runs, and compares the best recipe each system was measured with: every GB300 run is a disaggregated multi-node Dynamo recipe, while most B300 runs are single-node.
 - **Router not simulated.** The effect of Dynamo's KV-aware routing is an assumption (the cache hit you select), not simulated request by request.
 - **Linear scaling.** Above 72 GPUs, GPU counts are extrapolated from the 72-GPU simulation.
 - **Vendor benchmarks.** Accuracy scores are mostly vendor-reported, and harnesses differ between labs, so cross-family comparisons are indicative.
@@ -124,6 +132,8 @@ The 64 runs without results are almost all on RTX PRO 6000. There AISimulate has
 | `scripts/run_grid.sh` | Runs the simulation grid with AISimulate |
 | `scripts/collect.py` | Collects each run's `pareto.csv` into one JSON |
 | `scripts/build_data.py` | Builds `data.json`; holds the model mapping, use-case presets and benchmark descriptions |
+| `scripts/build_measured.py` | Adds InferenceX measurements to `data.json` as the Measured source |
+| `validation/` | Downloads the InferenceX dump and checks the simulation against it (see its README) |
 
 ## Regenerating the data
 
@@ -141,9 +151,15 @@ python3 scripts/build_data.py sim.json data/benchmarks.json data.json
 - Finished runs are skipped, so the script can be stopped and restarted.
 - Then view the page as in [Quick start](#quick-start).
 
+To refresh the Measured source, extract the InferenceX tables as described in [`validation/README.md`](validation/README.md), then run this after `build_data.py`:
+
+```bash
+python3 scripts/build_measured.py validation/tables.json data.json   # optional 3rd argument: max age in days, default 120
+```
+
 ## Roadmap: validation (v2)
 
-Planned next steps to check the simulated numbers against real measurements. None of this is implemented yet.
+Planned next steps to check the simulated numbers against real measurements. The first check against InferenceX is in [`validation/`](validation/README.md): measured GB300 is about 1.6–1.8× B300 per GPU (median), while the simulation gives about 1.05×, because AISimulate cannot simulate wide expert parallelism across the NVL72 rack.
 
 ### Fixed-length scenarios against InferenceX
 

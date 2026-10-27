@@ -1,0 +1,115 @@
+
+== by system and serving mode
+('b300', 'agg')                    points  444  simulated  299 ( 67%)
+    TTFT       MAPE   47%  median  -23%  ±25%  27%
+    TPOT       MAPE   21%  median  +11%  ±25%  70%
+    tok/s/GPU  MAPE   40%  median  -30%  ±25%  43%
+('b300', 'disagg')                 points  175  simulated   80 ( 46%)
+    TTFT       MAPE   53%  median  -45%  ±25%  26%
+    TPOT       MAPE   34%  median  +26%  ±25%  46%
+    tok/s/GPU  MAPE   53%  median  -43%  ±25%   5%
+('gb300', 'disagg')                points  335  simulated   68 ( 20%)
+    TTFT       MAPE   65%  median  -70%  ±25%  12%
+    TPOT       MAPE   46%  median  +33%  ±25%  26%
+    tok/s/GPU  MAPE   45%  median  -41%  ±25%   9%
+
+== by system and model
+('b300', 'dsr1', 'fp4')            points   21  simulated   21 (100%)
+    TTFT       MAPE   54%  median  -54%  ±25%  19%
+    TPOT       MAPE    4%  median   +3%  ±25% 100%
+    tok/s/GPU  MAPE   80%  median  -76%  ±25%   0%
+('b300', 'dsr1', 'fp8')            points   10  simulated   10 (100%)
+    TTFT       MAPE   38%  median  -33%  ±25%  30%
+    TPOT       MAPE    9%  median   -9%  ±25% 100%
+    tok/s/GPU  MAPE   13%  median  +12%  ±25% 100%
+('b300', 'dsv4', 'fp4')            points   75  simulated   48 ( 64%)
+    TTFT       MAPE   53%  median  -21%  ±25%  27%
+    TPOT       MAPE   15%  median   +4%  ±25%  85%
+    tok/s/GPU  MAPE   36%  median  -17%  ±25%  50%
+('b300', 'glm5', 'fp8')            points   14  simulated   14 (100%)
+    TTFT       MAPE   33%  median  -12%  ±25%  43%
+    TPOT       MAPE   16%  median  -15%  ±25% 100%
+    tok/s/GPU  MAPE   22%  median  +21%  ±25%  64%
+('b300', 'kimik2.5', 'fp4')        points   38  simulated   34 ( 89%)
+    TTFT       MAPE   41%  median  +31%  ±25%  24%
+    TPOT       MAPE   50%  median  +50%  ±25%   9%
+    tok/s/GPU  MAPE   50%  median  -36%  ±25%   3%
+('b300', 'kimik2.5', 'int4')       points   20  simulated    0 (  0%)
+('b300', 'minimaxm2.5', 'fp4')     points   79  simulated   65 ( 82%)
+    TTFT       MAPE   55%  median  -32%  ±25%  26%
+    TPOT       MAPE   21%  median  +19%  ±25%  74%
+    tok/s/GPU  MAPE   40%  median  -38%  ±25%  23%
+('b300', 'minimaxm2.5', 'fp8')     points   59  simulated    0 (  0%)
+('b300', 'minimaxm3', 'fp4')       points  136  simulated  129 ( 95%)
+    TTFT       MAPE   49%  median  -24%  ±25%  28%
+    TPOT       MAPE   32%  median  +29%  ±25%  40%
+    tok/s/GPU  MAPE   54%  median  -40%  ±25%  22%
+('b300', 'minimaxm3', 'fp8')       points  109  simulated    0 (  0%)
+('b300', 'qwen3.5', 'bf16')        points   20  simulated   20 (100%)
+    TTFT       MAPE   42%  median  -45%  ±25%  25%
+    TPOT       MAPE   10%  median  +10%  ±25% 100%
+    tok/s/GPU  MAPE    8%  median   -5%  ±25% 100%
+('b300', 'qwen3.5', 'fp4')         points   24  simulated   24 (100%)
+    TTFT       MAPE   49%  median  -59%  ±25%  25%
+    TPOT       MAPE   13%  median  +10%  ±25%  92%
+    tok/s/GPU  MAPE   31%  median  -29%  ±25%  50%
+('b300', 'qwen3.5', 'fp8')         points   14  simulated   14 (100%)
+    TTFT       MAPE   40%  median  -48%  ±25%  29%
+    TPOT       MAPE    9%  median   +9%  ±25% 100%
+    tok/s/GPU  MAPE    7%  median   -4%  ±25% 100%
+('gb300', 'dsr1', 'fp8')           points   14  simulated    0 (  0%)
+('gb300', 'dsv4', 'fp4')           points   44  simulated    3 (  7%)
+    TTFT       MAPE   37%  median  -24%  ±25%  67%
+    TPOT       MAPE    6%  median   +1%  ±25% 100%
+    tok/s/GPU  MAPE   32%  median  -38%  ±25%  33%
+('gb300', 'glm5', 'fp4')           points   43  simulated    7 ( 16%)
+    TTFT       MAPE   75%  median  -71%  ±25%   0%
+    TPOT       MAPE   48%  median  +39%  ±25%  29%
+    tok/s/GPU  MAPE   33%  median  -27%  ±25%  43%
+('gb300', 'glm5', 'fp8')           points   19  simulated    0 (  0%)
+('gb300', 'kimik2.5', 'fp4')       points   40  simulated    9 ( 22%)
+    TTFT       MAPE   73%  median  -85%  ±25%  11%
+    TPOT       MAPE   64%  median  +58%  ±25%   0%
+    tok/s/GPU  MAPE   35%  median  -32%  ±25%  22%
+('gb300', 'minimaxm2.5', 'fp4')    points   34  simulated   21 ( 62%)
+    TTFT       MAPE   51%  median  -52%  ±25%  24%
+    TPOT       MAPE   28%  median  +25%  ±25%  48%
+    tok/s/GPU  MAPE   38%  median  -37%  ±25%   0%
+('gb300', 'minimaxm2.5', 'fp8')    points   40  simulated    0 (  0%)
+('gb300', 'minimaxm3', 'fp8')      points   49  simulated    0 (  0%)
+('gb300', 'qwen3.5', 'fp4')        points   30  simulated   13 ( 43%)
+    TTFT       MAPE   79%  median  -82%  ±25%   0%
+    TPOT       MAPE   81%  median  +85%  ±25%   0%
+    tok/s/GPU  MAPE   54%  median  -59%  ±25%   0%
+('gb300', 'qwen3.5', 'fp8')        points   22  simulated   15 ( 68%)
+    TTFT       MAPE   69%  median  -77%  ±25%   0%
+    TPOT       MAPE   36%  median  +38%  ±25%  20%
+    tok/s/GPU  MAPE   62%  median  -63%  ±25%   0%
+
+== GB300 coverage by decode EP
+('b300', 'decode EP<16')           points  619  simulated  379 ( 61%)
+    TTFT       MAPE   48%  median  -30%  ±25%  27%
+    TPOT       MAPE   24%  median  +15%  ±25%  65%
+    tok/s/GPU  MAPE   42%  median  -34%  ±25%  35%
+('gb300', 'decode EP<16')          points  242  simulated   66 ( 27%)
+    TTFT       MAPE   64%  median  -70%  ±25%  12%
+    TPOT       MAPE   44%  median  +33%  ±25%  27%
+    tok/s/GPU  MAPE   44%  median  -41%  ±25%   9%
+('gb300', 'decode EP>=16')         points   93  simulated    2 (  2%)
+    TTFT       MAPE   94%  median  -94%  ±25%   0%
+    TPOT       MAPE  108%  median +108%  ±25%   0%
+    tok/s/GPU  MAPE   68%  median  -68%  ±25%   0%
+
+== reasons for points that could not be simulated
+ 129  b300   PerfDataNotAvailableError: perf database error: MoE data missing for MoeKey { quant: "fp8", distr
+ 110  gb300  PerfDataNotAvailableError: Cross-node EP requires DeepEP A2A data, but no compatible exact or sup
+  37  b300   PerfDataNotAvailableError: perf database error: context MSA module data missing for DsaKey { arch
+  36  gb300  PerfDataNotAvailableError: perf database error: MoE data missing for MoeKey { quant: "fp8", distr
+  20  b300   PerfDataNotAvailableError: perf database error: GEMM perf data missing for quant 'int4_wo' at /ho
+  13  b300   PerfDataNotAvailableError: perf database error: MoE data missing for MoeKey { quant: "w4a8_mxfp4_
+  12  gb300  PerfDataNotAvailableError: perf database error: context MSA module data missing for DsaKey { arch
+   9  gb300  adapter_rejected: concurrency (2253) must be divisible by decode replicas * attention DP
+   9  b300   PerfDataNotAvailableError: perf database error: perf database error: no DSV4 module rows loaded f
+   8  gb300  PerfDataNotAvailableError: perf database error: perf database error: no DSV4 module rows loaded f
+   7  b300   RuntimeError: OOM: the model 'MiniMaxAI/MiniMax-M3' does not fit in GPU memory on sy
+   7  b300   RuntimeError: OOM: the model 'MiniMaxAI/MiniMax-M2.5' does not fit in GPU memory on 

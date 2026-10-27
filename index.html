@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Infra Planner</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -117,8 +118,8 @@ a { color: var(--accent); }
 <div class="wrap">
   <header>
     <div style="display:grid;gap:4px">
-      <h1>Infra Planner <span>B300 NVL72 · NVL8 · RTX PRO 6000</span></h1>
-      <p class="sub">Which infrastructure fits each use case, model and expected traffic, at equal GPU count. The curves come from AISimulate (NVIDIA Dynamo) simulations on 72 GPUs per system.</p>
+      <h1>Infra Planner <span>GB300 NVL72 · B300 NVL8 · RTX PRO 6000</span></h1>
+      <p class="sub">Which infrastructure fits each use case, model and expected traffic, at equal GPU count. The curves come from AISimulate (NVIDIA Dynamo) simulations on 72 GPUs per system, or from real measurements published by SemiAnalysis InferenceX.</p>
     </div>
     <span class="pill" id="dataStamp">loading data…</span>
   </header>
@@ -130,6 +131,12 @@ a { color: var(--accent); }
 
   <div class="grid">
     <aside class="panel controls" aria-label="Scenario">
+      <div class="field">
+        <span class="label">Data source</span>
+        <div class="seg" id="sourceSeg" aria-label="Data source"></div>
+        <p class="hint" id="sourceDesc" style="margin:0"></p>
+      </div>
+
       <div class="field">
         <div class="row" style="justify-content:space-between;align-items:baseline">
           <span class="label">Accuracy benchmark</span>
@@ -214,7 +221,8 @@ a { color: var(--accent); }
 
       <section class="panel notes">
         <h2>How to read the numbers</h2>
-        <p><b>Synthetic data.</b> All results are simulated, not measured, and use synthetic traffic: every request in a scenario has the same input and output length, and cache reuse is a fixed share of the prompt rather than real multi-turn or agentic sessions. Use them to compare systems, not to predict production numbers.</p>
+        <p><b>Measured data.</b> With the "Measured" source the curves are real runs from <a href="https://inferencex.semianalysis.com" target="_blank" rel="noopener">SemiAnalysis InferenceX</a> (public database dump, last 120 days, no speculative decoding). Each point keeps its framework, precision, GPU count and topology, with a link to the run. InferenceX covers fewer models and only three workloads without prefix cache, and every GB300 run is a disaggregated multi-node Dynamo recipe, so part of the gap with B300 may come from recipe tuning. RTX PRO 6000 has only a handful of Qwen3.5 runs.</p>
+        <p><b>Simulated data.</b> With the "Simulated" source the results are not measured and use synthetic traffic: every request in a scenario has the same input and output length, and cache reuse is a fixed share of the prompt rather than real multi-turn or agentic sessions. Use them to compare systems, not to predict production numbers.</p>
         <p><b>Source.</b> Each point is a configuration found by <span class="mono">aiconfigurator cli default</span> from the AISimulate package (TensorRT-LLM backend, vLLM for DeepSeek V4 Flash; SILICON perf database) with a 72-GPU budget: GB300 NVL72 (one NVLink rack), B300 HGX NVL8 (9 nodes of 8 over InfiniBand), RTX PRO 6000 server (9 nodes of 8, PCIe). AISimulate is experimental and NVIDIA positions it for evaluation, not for production capacity planning.</p>
         <p><b>Dynamo on / off.</b> On: the best of aggregated and disaggregated serving, with the selected cache hit (assumed to be achieved by the KV-aware router). Off: aggregated serving only and no prefix reuse across replicas (round-robin routing). This is a modelling assumption: the Dynamo router is not simulated request by request in this version.</p>
         <p><b>Traffic.</b> GPUs needed are estimated by linearly scaling the per-GPU throughput of the best point that meets the SLA. Above 72 GPUs this is an extrapolation.</p>
@@ -239,7 +247,7 @@ const fmt = (v, d = 0) => v == null || !isFinite(v) ? "–" : Number(v).toLocale
 const fmtK = v => v >= 1000 ? fmt(v / 1000, v >= 10000 ? 0 : 1) + "k" : fmt(v);
 
 let DATA = null;
-const S = { metric: null, uc: "rag", model: null, isl: 4000, osl: 500, pct: 50, dynamo: true, ttft: 2000, minSpeed: 20, traffic: 20, minScore: 0 };
+const S = { source: "sim", metric: null, uc: "rag", model: null, isl: 4000, osl: 500, pct: 50, dynamo: true, ttft: 2000, minSpeed: 20, traffic: 20, minScore: 0 };
 
 function load(key, fallback) { try { const v = localStorage.getItem("planner." + key); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } }
 function save() { try { localStorage.setItem("planner.state", JSON.stringify(S)); } catch {} }
@@ -256,6 +264,13 @@ function seg(el, items, cur, onPick) {
 }
 
 function ucDef() { return DATA.usecases[S.uc]; }
+// Data source: AISimulate simulations (keyed by the simulated checkpoint) or InferenceX measurements (keyed by the model card).
+const MEAS = () => S.source === "meas";
+const store = () => (MEAS() ? DATA.measured : DATA.results) || {};
+const dataId = m => m && (MEAS() ? m.bench : m.sim);
+const hasData = m => !!store()[dataId(m)];
+// InferenceX measures with random prompts, so there is no prefix reuse to exploit.
+const wantPct = () => MEAS() || !S.dynamo ? 0 : S.pct;
 function modelScore(m) {
   const s = m.scores?.[S.metric];
   return s && typeof s.value === "number" ? { key: S.metric, value: s.value, source: s.source, note: s.note } : null;
@@ -263,10 +278,10 @@ function modelScore(m) {
 function metricLabel(k) { return DATA.metricLabels?.[k] || k; }
 
 // Closest simulated combination to the requested one (log distance on input/output tokens, same cache hit when possible).
-function resolve(simId) {
-  const pct = S.dynamo ? S.pct : 0, want = { isl: S.isl, osl: S.osl, pct };
+function resolve(id) {
+  const want = { isl: S.isl, osl: S.osl, pct: wantPct() };
   const combos = new Map();
-  for (const key of Object.keys(DATA.results[simId] || {})) { const [, i, o, p] = key.split("|").map(Number); combos.set(`${i}|${o}|${p}`, { isl: i, osl: o, pct: p }); }
+  for (const key of Object.keys(store()[id] || {})) { const [, i, o, p] = key.split("|").map(Number); combos.set(`${i}|${o}|${p}`, { isl: i, osl: o, pct: p }); }
   if (!combos.size) return null;
   if (combos.has(`${want.isl}|${want.osl}|${want.pct}`)) return want;
   let bestC = null, bestD = Infinity;
@@ -277,17 +292,17 @@ function resolve(simId) {
   return bestC;
 }
 // Points per system for the current scenario, filtered by the TTFT SLA.
-function points(simId, sys) {
-  const c = resolve(simId); if (!c) return null;
-  const r = DATA.results[simId]?.[`${sys}|${c.isl}|${c.osl}|${c.pct}`];
+function points(id, sys) {
+  const c = resolve(id); if (!c) return null;
+  const r = store()[id]?.[`${sys}|${c.isl}|${c.osl}|${c.pct}`];
   if (!r) return null;
   let pts = (r.agg || []).map(p => ({ mode: "agg", p }));
   if (S.dynamo) pts = pts.concat((r.disagg || []).map(p => ({ mode: "disagg", p })));
-  return pts.map(({ mode, p }) => ({ mode, tpg: p[0], tpu: p[1], ttft: p[2], tpot: p[3], rpg: p[4], cfg: p[5] }))
+  return pts.map(({ mode, p }) => ({ mode, tpg: p[0], tpu: p[1], ttft: p[2], tpot: p[3], rpg: p[4], cfg: p[5], url: p[6] }))
             .filter(x => x.ttft <= S.ttft);
 }
-function best(simId, sys) {
-  const pts = points(simId, sys);
+function best(id, sys) {
+  const pts = points(id, sys);
   if (pts == null) return { status: "nosim" };
   const ok = pts.filter(x => x.tpu >= S.minSpeed);
   if (!ok.length) return { status: "nosla", pts, maxSpeed: Math.max(0, ...pts.map(x => x.tpu)) };
@@ -313,6 +328,17 @@ function render() {
     $("ucPanel").appendChild(b);
   }
   $("ucHint").textContent = uc.hint;
+  seg($("sourceSeg"), [{ value: "sim", label: "Simulated" }, { value: "meas", label: "Measured" }], S.source, v => {
+    S.source = v;
+    // Keep the model if the new source has it, otherwise jump to the best-ranked model that has data.
+    const cur = DATA.models.find(m => m.sim === S.model);
+    if (!hasData(cur)) S.model = DATA.models.filter(hasData).sort((x, y) => (modelScore(y)?.value ?? -1) - (modelScore(x)?.value ?? -1))[0]?.sim ?? S.model;
+    render();
+  });
+  const mi = DATA.measuredInfo;
+  $("sourceDesc").innerHTML = MEAS()
+    ? `Real runs from <a href="https://inferencex.semianalysis.com" target="_blank" rel="noopener">InferenceX</a> (${mi ? `measured up to ${mi.through}` : "no data"}). Only 1k/1k, 1k/8k and 8k/1k, no prefix cache, and only the models and systems SemiAnalysis tested.`
+    : `AISimulate estimates. Checked against InferenceX they <b>underestimate GB300 NVL72</b> on large MoE models (measured about 1.6–1.8× B300 per GPU, simulated 1.05×): see <span class="mono">validation/</span>.`;
   if (!uc.metrics.includes(S.metric)) S.metric = uc.metrics[0];
   seg($("metricSeg"), uc.metrics.map(k => ({ value: k, label: metricLabel(k) })), S.metric, v => { S.metric = v; render(); });
   [...$("metricSeg").children].forEach((b, i) => { b.title = DATA.metricInfo?.[uc.metrics[i]] || ""; });
@@ -323,16 +349,16 @@ function render() {
   const ms = DATA.models.map(m => ({ m, s: modelScore(m) }))
     .sort((a, b) => (b.s?.value ?? -1) - (a.s?.value ?? -1));
   const visible = ms.filter(x => S.minScore === 0 || (x.s?.value ?? 0) >= S.minScore);
-  if (!visible.some(x => x.m.sim === S.model)) S.model = (visible.find(x => DATA.results[x.m.sim]) || visible[0])?.m.sim;
+  if (!visible.some(x => x.m.sim === S.model)) S.model = (visible.find(x => hasData(x.m)) || visible[0])?.m.sim;
   const list = $("modelList"); list.innerHTML = "";
   for (const { m, s } of visible) {
     const row = document.createElement("div");
-    row.className = "mrow" + (DATA.results[m.sim] ? "" : " off");
+    row.className = "mrow" + (hasData(m) ? "" : " off");
     row.setAttribute("role", "option"); row.tabIndex = 0;
     row.setAttribute("aria-selected", String(m.sim === S.model));
     const ctx = m.context_k ? `${m.context_k}k ctx` : "";
     const size = m.total_params_b ? `${m.total_params_b}B${m.active_params_b && m.active_params_b !== m.total_params_b ? "/" + m.active_params_b + "B act." : ""}` : "";
-    row.innerHTML = `<div style="min-width:0"><div class="mname">${m.name}</div><div class="mmeta">${[size, ctx, DATA.results[m.sim] ? "" : "not simulated"].filter(Boolean).join(" · ")}</div></div>
+    row.innerHTML = `<div style="min-width:0"><div class="mname">${m.name}</div><div class="mmeta">${[size, ctx, hasData(m) ? "" : MEAS() ? "not measured" : "not simulated"].filter(Boolean).join(" · ")}</div></div>
       <div><div class="score">${s ? fmt(s.value, 1) : "n/a"}</div><div class="bar"><i style="width:${s ? Math.min(100, s.value) : 0}%"></i></div></div>`;
     row.title = s ? `${metricLabel(s.key)}: ${s.value}${s.note ? " · " + s.note : ""}\n${s.source || "source n/a"}` : "no published score for this benchmark";
     const pick = () => { S.model = m.sim; render(); };
@@ -344,11 +370,13 @@ function render() {
   if (S.isl + S.osl > ctxTok * 1.03) S.isl = ISLS.filter(i => i + S.osl <= ctxTok * 1.03).pop() || ISLS[0];
   seg($("islSeg"), ISLS.map(v => ({ value: v, label: fmtK(v), disabled: v + S.osl > ctxTok * 1.03, title: "beyond the model's context window" })), S.isl, v => { S.isl = v; render(); });
   seg($("oslSeg"), OSLS.map(v => ({ value: v, label: fmtK(v) })), S.osl, v => { S.osl = v; render(); });
-  const rc = model && DATA.results[model.sim] ? resolve(model.sim) : null, wantPct = S.dynamo ? S.pct : 0;
-  const snapped = rc && (rc.isl !== S.isl || rc.osl !== S.osl || rc.pct !== wantPct);
+  const rc = hasData(model) ? resolve(dataId(model)) : null;
+  const snapped = rc && (rc.isl !== S.isl || rc.osl !== S.osl || rc.pct !== wantPct());
   $("snap").hidden = !snapped;
-  if (snapped) $("snap").textContent = `Combination not simulated yet: using the closest one, ${fmtK(rc.isl)} in / ${fmtK(rc.osl)} out, cache ${rc.pct}%.`;
-  seg($("pctSeg"), PCTS.map(v => ({ value: v, label: v + "%", disabled: !S.dynamo && v > 0, title: "without Dynamo, reuse across replicas is not guaranteed" })), S.dynamo ? S.pct : 0, v => { S.pct = v; render(); });
+  if (snapped) $("snap").textContent = MEAS()
+    ? `Not measured by InferenceX: using the closest measured workload, ${fmtK(rc.isl)} in / ${fmtK(rc.osl)} out, no prefix cache.`
+    : `Combination not simulated yet: using the closest one, ${fmtK(rc.isl)} in / ${fmtK(rc.osl)} out, cache ${rc.pct}%.`;
+  seg($("pctSeg"), PCTS.map(v => ({ value: v, label: v + "%", disabled: (MEAS() || !S.dynamo) && v > 0, title: MEAS() ? "InferenceX measures without prefix reuse" : "without Dynamo, reuse across replicas is not guaranteed" })), wantPct(), v => { S.pct = v; render(); });
   $("dynamo").checked = S.dynamo; $("ttft").value = S.ttft; $("minSpeed").value = S.minSpeed;
   $("traffic").value = Math.log10(S.traffic);
   $("trafficVal").textContent = fmt(S.traffic, S.traffic < 10 ? 1 : 0) + " req/s";
@@ -356,7 +384,7 @@ function render() {
   $("trafficHint").textContent = `≈ ${fmt(S.traffic * 3600, 0)} requests/hour, ${fmt(tokDay / 1e9, 1)} billion tokens/day (in+out)`;
 
   const res = {};
-  for (const k of SYS_KEYS) res[k] = model ? best(model.sim, k) : { status: "nosim" };
+  for (const k of SYS_KEYS) res[k] = model ? best(dataId(model), k) : { status: "nosim" };
   renderVerdict(model, res);
   renderCards(res);
   renderPareto(res);
@@ -379,13 +407,13 @@ function renderVerdict(model, res) {
   if (!model) { v.textContent = "No model above the accuracy threshold."; sub.textContent = ""; $("band").innerHTML = ""; return; }
   const w = winnerAt(res, S.traffic);
   if (!w) {
-    const why = SYS_KEYS.map(k => res[k]).some(r => r.status === "nosla") ? "no system meets the SLA: lower the minimum speed or raise the TTFT" : "no simulation available for this scenario";
+    const why = SYS_KEYS.map(k => res[k]).some(r => r.status === "nosla") ? "no system meets the SLA: lower the minimum speed or raise the TTFT" : MEAS() ? "no InferenceX measurement for this model" : "no simulation available for this scenario";
     v.textContent = `${model.name}: ${why}.`; sub.textContent = ""; $("band").innerHTML = ""; $("bandAxis").innerHTML = ""; return;
   }
   const eff = SYS_KEYS.filter(k => res[k].status === "ok").map(k => `${SYS[k].short} ${fmt(res[k].b.tpg)}`).join(" · ");
   v.innerHTML = `At ${fmt(S.traffic, S.traffic < 10 ? 1 : 0)} req/s the best fit is <span style="color:var(${SYS[w.k].c})">${SYS[w.k].label}</span>: ${fmt(w.g)} GPUs.`;
-  const rc = resolve(model.sim);
-  sub.textContent = `${model.name}, ${fmtK(rc.isl)} in / ${fmtK(rc.osl)} out, cache ${rc.pct}%, Dynamo ${S.dynamo ? "on" : "off"}. ` +
+  const rc = resolve(dataId(model));
+  sub.textContent = `${MEAS() ? "Measured" : "Simulated"}: ${model.name}, ${fmtK(rc.isl)} in / ${fmtK(rc.osl)} out, cache ${rc.pct}%, Dynamo ${S.dynamo ? "on" : "off"}. ` +
     `Tokens/s per GPU at SLA: ${eff}.`;
   // winner band across traffic (log scale from 0.1 to 5000 req/s)
   const lo = -1, hi = 3.7, n = 240, segs = [];
@@ -405,7 +433,9 @@ function renderCards(res) {
   $("cards").innerHTML = SYS_KEYS.map(k => {
     const r = res[k], s = SYS[k];
     let body;
-    if (r.status === "nosim") body = `<span class="pill na">cannot simulate</span><span class="hint">AISimulate has no data for this model on ${s.label} with this backend, or the configuration does not fit in memory.</span>`;
+    if (r.status === "nosim") body = MEAS()
+      ? `<span class="pill na">not measured</span><span class="hint">InferenceX has no run of this model on ${s.label}.</span>`
+      : `<span class="pill na">cannot simulate</span><span class="hint">AISimulate has no data for this model on ${s.label} with this backend, or the configuration does not fit in memory.</span>`;
     else if (r.status === "nosla") body = `<span class="pill na">SLA not met</span><span class="hint">Max speed with TTFT ≤ ${fmt(S.ttft)} ms: ${fmt(r.maxSpeed, 0)} tokens/s per user.</span>`;
     else {
       const g = gpusNeeded(r.b.rpg, S.traffic), buy = purchased(k, g);
@@ -418,7 +448,7 @@ function renderCards(res) {
           <dt>GPUs for ${fmt(S.traffic, S.traffic < 10 ? 1 : 0)} req/s</dt><dd>${fmt(Math.ceil(g))} → ${fmt(buy)}</dd>
           <dt>Units</dt><dd>${fmt(buy / s.unit)} ${s.unitName[buy / s.unit === 1 ? 0 : 1]}</dd>
         </dl>
-        <div class="cfg">${r.b.mode === "disagg" ? "disaggregated" : "aggregated"}: ${r.b.cfg}</div>`;
+        <div class="cfg">${r.b.mode === "disagg" ? "disaggregated" : "aggregated"}: ${r.b.cfg}${r.b.url ? ` · <a href="${r.b.url}" target="_blank" rel="noopener">run</a>` : ""}</div>`;
     }
     return `<article class="card" style="--c:var(${s.c})"><h3>${s.label}</h3>${body}</article>`;
   }).join("");
@@ -486,7 +516,7 @@ function renderScaling(res) {
 function renderMatrix(models) {
   const rows = models.map(m => {
     const s = modelScore(m);
-    const r = {}; for (const k of SYS_KEYS) r[k] = DATA.results[m.sim] ? best(m.sim, k) : { status: "nosim" };
+    const r = {}; for (const k of SYS_KEYS) r[k] = hasData(m) ? best(dataId(m), k) : { status: "nosim" };
     const w = winnerAt(r, S.traffic);
     const cell = k => r[k].status === "ok" ? `${fmt(r[k].b.rpg * 72, 1)}` : r[k].status === "nosla" ? "SLA ✕" : "–";
     return `<tr><td>${m.name}</td><td class="num">${s ? fmt(s.value, 1) : "n/a"}</td>${SYS_KEYS.map(k => `<td class="num">${cell(k)}</td>`).join("")}<td>${w ? `<span style="color:var(${SYS[w.k].c});font-weight:600">${SYS[w.k].short}</span> <span class="hint">${fmt(w.g)} GPUs</span>` : "–"}</td></tr>`;
@@ -514,7 +544,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   applyUc("chat");
   Object.assign(S, load("state", {}));
   if (!DATA.usecases[S.uc]) applyUc("chat");
-  $("dataStamp").textContent = `simulations from ${d.generated} · ${d.combos} scenarios`;
+  $("dataStamp").textContent = `simulations from ${d.generated} · ${d.combos} scenarios` + (d.measuredInfo ? ` · ${d.measuredInfo.points} InferenceX measurements to ${d.measuredInfo.through}` : "");
   if (d.benchNote) $("benchNote").innerHTML = `<b>Benchmarks.</b> ${d.benchNote}`;
   if (d.failures?.length) $("failNote").innerHTML = `<b>Cannot simulate.</b> ${d.failures.length} model/system/scenario combinations produced no results (missing data for that system, or not enough memory) and show as "cannot simulate".`;
   wire(); render();

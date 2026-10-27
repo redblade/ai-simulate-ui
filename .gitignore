@@ -3,3 +3,5 @@ runs/
 venv/
 sim.json
 __pycache__/
+validation/tables.copy
+validation/tables.json
